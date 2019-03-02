@@ -1,0 +1,4 @@
+body > #root > div {
+    height: 100vh;
+    background-color: rgb(215, 210, 219);
+}

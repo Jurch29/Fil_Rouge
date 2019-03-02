@@ -1,0 +1,15 @@
+H1{
+    color:red;
+    font-style: italic;
+    text-align: center;
+}
+
+p
+{
+    color: blue;
+}
+
+.result{
+    color: rgb(47, 194, 10);
+    text-decoration: underline;
+}
