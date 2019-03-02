@@ -221,7 +221,7 @@ class Navigbar extends Component {
           },
           {
             containerClass: 'RML-form-group',
-            label: 'Password',
+            label: 'Mot de passe',
             type: 'password',
             inputClass: 'RML-form-control',
             id: 'password',
@@ -232,7 +232,7 @@ class Navigbar extends Component {
         registerInputs: [
           {
             containerClass: 'RML-form-group',
-            label: 'Nickname',
+            label: 'Prénom',
             type: 'text',
             inputClass: 'RML-form-control',
             id: 'login',
@@ -250,7 +250,7 @@ class Navigbar extends Component {
           },
           {
             containerClass: 'RML-form-group',
-            label: 'Password',
+            label: 'Mot de passe',
             type: 'password',
             inputClass: 'RML-form-control',
             id: 'password',
