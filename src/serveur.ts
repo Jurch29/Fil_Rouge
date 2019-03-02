@@ -38,19 +38,6 @@ export default class Server {
         }
         app.use(cors(corsOptions));
 
-        app.get('/', function(req: Request, res : Response){
-            res.writeHead(200, {
-                'Content-Type' : 'text/html'
-            });
-            fs.readFile('./html/index.html', (err: Error, data: Buffer) => { 
-                if (err) { 
-                    throw err; 
-                } 
-                res.write(data);
-                res.end(); 
-            });
-        })
-
         app.post('/auth', async function(req : any, res : any) {
             res.setHeader('Content-Type', 'text/plain');
             
@@ -71,6 +58,20 @@ export default class Server {
 
             res.send(result);
         });
+
+        /*
+        app.get('/', function(req: Request, res : Response){
+            res.writeHead(200, {
+                'Content-Type' : 'text/html'
+            });
+            fs.readFile('./html/index.html', (err: Error, data: Buffer) => { 
+                if (err) { 
+                    throw err; 
+                } 
+                res.write(data);
+                res.end(); 
+            });
+        })
 
         app.post('/selectionnerMongoDB', function(req:any, res:any) {
             res.setHeader('Content-Type', 'text/plain');
@@ -198,9 +199,13 @@ export default class Server {
             console.log("requete lance : "+req.body.maSelection);
             res.send("Resultat : "+ JSON.stringify(data)); //on recoit un json on renvoie un string
         });
-        
+
+        */
+
+
         app.listen(this.port, function() {
             console.log('Serveur démarré (4000)');
         })
+        
     }
 }
