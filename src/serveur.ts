@@ -55,6 +55,7 @@ export default class Server {
             res.setHeader('Content-Type', 'text/plain');
             
             let result = "success";
+            let ok;
 
             let login = req.body.login;
             let mdp = req.body.mdp;
