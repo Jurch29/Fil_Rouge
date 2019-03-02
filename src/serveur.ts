@@ -59,6 +59,11 @@ export default class Server {
             res.send(result);
         });
 
+
+        app.post('/register', async function(req : any, res : any) {
+            
+        });
+
         /*
         app.get('/', function(req: Request, res : Response){
             res.writeHead(200, {
