@@ -1,95 +1,85 @@
-import { Request, Response } from 'express'
-const express = require('express')
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express = require('express');
 let fs = require('fs');
 let body_parser = require('body-parser');
 var utf8 = require('utf8');
 var path = require('path');
 var _ = require('underscore');
 const cors = require('cors');
-import Mariadb from './api_mariadb';
-import Mongodb from './api_mongodb';
-import neo4j from './api_neo4j';
-
-export default class Server {
-
-    readonly port : number
-
-    constructor (port : number){
-        this.port = port
+const api_mariadb_1 = __importDefault(require("./api_mariadb"));
+const api_mongodb_1 = __importDefault(require("./api_mongodb"));
+const api_neo4j_1 = __importDefault(require("./api_neo4j"));
+class Server {
+    constructor(port) {
+        this.port = port;
     }
-
     start() {
-
-        const app = express()
-        let mariadinstance = new Mariadb();
-        let mongodbinstance = new Mongodb();
-        let neo4jinstance = new neo4j();
-
-        app.use(body_parser.urlencoded({    //pour le parsing
-            extended : true
+        const app = express();
+        let mariadinstance = new api_mariadb_1.default();
+        let mongodbinstance = new api_mongodb_1.default();
+        let neo4jinstance = new api_neo4j_1.default();
+        app.use(body_parser.urlencoded({
+            extended: true
         }));
         app.use(body_parser.json());
         app.use(express.static(path.join(__dirname, 'public'))); //pour le css
         // Add headers
-
         var corsOptions = {
-        origin: '*',
-        optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204 
-        }
+            origin: '*',
+            optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204 
+        };
         app.use(cors(corsOptions));
-
-        app.post('/auth', async function(req : any, res : any) {
-            res.setHeader('Content-Type', 'text/plain');
-            
-            let result = "success";
-
-            let login = req.body.login;
-            let mdp = req.body.mdp;
-
-            let reqdb = 'SELECT COUNT(*) AS count FROM log WHERE login='+"'"+login+"'"+' AND pswd='+"'"+mdp+"'"+';';
-            
-            console.log("requete lance : "+reqdb);
-            
-            let data =  await mariadinstance.execquery(reqdb).catch((err) => console.log('Error : '+err));
-
-            let auth = data[0].count;
-            if (auth === 0)
-                result = 'failed';
-
-            res.send(result);
+        app.post('/auth', function (req, res) {
+            return __awaiter(this, void 0, void 0, function* () {
+                res.setHeader('Content-Type', 'text/plain');
+                let result = "success";
+                let login = req.body.login;
+                let mdp = req.body.mdp;
+                let reqdb = 'SELECT COUNT(*) AS count FROM log WHERE login=' + "'" + login + "'" + ' AND pswd=' + "'" + mdp + "'" + ';';
+                console.log("requete lance : " + reqdb);
+                let data = yield mariadinstance.execquery(reqdb).catch((err) => console.log('Error : ' + err));
+                let auth = data[0].count;
+                if (auth === 0)
+                    result = 'failed';
+                res.send(result);
+            });
         });
-
-        app.post('/register', async function(req : any, res : any) {
-            res.setHeader('Content-Type', 'text/plain');
-            
-            let result = "success";
-
-            let login = req.body.login;
-            let mdp = req.body.mdp;
-            let prenom = req.body.prenom;
-
-            let reqdb = 'INSERT log VALUES('+"'"+prenom+"','"+login+"','"+mdp+"');"    
-            
-            console.log("requete lance : "+reqdb);
-            
-            let data =  await mariadinstance.execquery(reqdb).catch((err) => console.log('Error : '+err));
-
-            res.send(result);
+        app.post('/register', function (req, res) {
+            return __awaiter(this, void 0, void 0, function* () {
+                res.setHeader('Content-Type', 'text/plain');
+                let result = "success";
+                let login = req.body.login;
+                let mdp = req.body.mdp;
+                let prenom = req.body.prenom;
+                let reqdb = 'INSERT log VALUES(' + "'" + prenom + "','" + login + "','" + mdp + "');";
+                console.log("requete lance : " + reqdb);
+                let data = yield mariadinstance.execquery(reqdb).catch((err) => console.log('Error : ' + err));
+                res.send(result);
+            });
         });
-
-
-
         /*
         app.get('/', function(req: Request, res : Response){
             res.writeHead(200, {
                 'Content-Type' : 'text/html'
             });
-            fs.readFile('./html/index.html', (err: Error, data: Buffer) => { 
-                if (err) { 
-                    throw err; 
-                } 
+            fs.readFile('./html/index.html', (err: Error, data: Buffer) => {
+                if (err) {
+                    throw err;
+                }
                 res.write(data);
-                res.end(); 
+                res.end();
             });
         })
 
@@ -221,9 +211,9 @@ export default class Server {
         });
 
         */
-        
-        app.listen(this.port, function() {
+        app.listen(this.port, function () {
             console.log('Serveur démarré (4000)');
-        })
+        });
     }
 }
+exports.default = Server;

@@ -18,7 +18,6 @@ const routing = (
     <div>
     
     <Navigbar />
-    <p>test</p>
 
       <Switch>
         <Route exact path="/" component={Acceuil} />

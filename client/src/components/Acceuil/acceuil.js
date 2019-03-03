@@ -6,7 +6,7 @@ class Acceuil extends Component {
 
   render() {
     return (
-        <h1>Acceuil caca asus2</h1>
+        <h1>Acceuil</h1>
     );
   }
 }

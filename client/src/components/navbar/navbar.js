@@ -77,7 +77,33 @@ class Navigbar extends Component {
         error: true
       })
     } else {
+
+      axios({
+        method: 'post',
+        url: 'http://localhost:4000/register',
+        headers: {
+            'crossDomain': true,  //For cors errors 
+            'Content-Type': 'application/json'
+        },
+        data: {
+            login: email,
+            mdp: password,
+            prenom: login
+        }
+        }).then(res => {
+            if (res.data === "failed"){
+              this.setState({
+                error: true
+              })
+            }
+            
+            else {
+              this.onLoginSuccess(email);
+            }  
+        });
       //this.onLoginSuccess('form');
+
+      
     }
   }
 
@@ -173,6 +199,7 @@ class Navigbar extends Component {
         <Form inline>
           <Button onClick={() => this.openModal()} variant="outline-info">Connexion</Button>
         </Form>
+        {loggedIn}
       </Navbar>
       <br />
 
@@ -271,7 +298,6 @@ class Navigbar extends Component {
         ],
       }}
     />
-    {loggedIn}
     </>
 
     );
