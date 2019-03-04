@@ -54,7 +54,7 @@ class Navigbar extends Component {
             }
             
             else {
-              this.onLoginSuccess(email);
+              this.onLoginSuccess(res.data);
             }
         });
     }
@@ -97,7 +97,7 @@ class Navigbar extends Component {
             }
             
             else {
-              this.onLoginSuccess(email);
+              this.onLoginSuccess(login);
             }  
         });
       //this.onLoginSuccess('form');
