@@ -12,7 +12,7 @@ import neo4j from './api_neo4j';
 
 export default class Server {
 
-    readonly port : number
+    readonly port : number;
 
     constructor (port : number){
         this.port = port
@@ -20,7 +20,8 @@ export default class Server {
 
     start() {
 
-        const app = express()
+        const app = express();
+        var username = null;
         let mariadinstance = new Mariadb();
         let mongodbinstance = new Mongodb();
         let neo4jinstance = new neo4j();
@@ -43,10 +44,10 @@ export default class Server {
             
             let result = "success";
 
-            let login = req.body.login;
+            let mail = req.body.login;
             let mdp = req.body.mdp;
 
-            let reqdb = 'SELECT COUNT(*) AS count FROM log WHERE login='+"'"+login+"'"+' AND pswd='+"'"+mdp+"'"+';';
+            let reqdb = 'SELECT COUNT(*) AS count FROM Utilisateur WHERE mail='+"'"+mail+"'"+' AND passwd='+"md5('"+mdp+"')"+';';
             
             console.log("requete lance : "+reqdb);
             
@@ -55,6 +56,8 @@ export default class Server {
             let auth = data[0].count;
             if (auth === 0)
                 result = 'failed';
+            else
+                username = mail;
 
             res.send(result);
         });
@@ -64,11 +67,11 @@ export default class Server {
             
             let result = "success";
 
-            let login = req.body.login;
+            let mail = req.body.login;
             let mdp = req.body.mdp;
-            let prenom = req.body.prenom;
+            let login = req.body.prenom;
 
-            let reqdb = 'INSERT log VALUES('+"'"+prenom+"','"+login+"','"+mdp+"');"    
+            let reqdb = 'INSERT Utilisateur VALUES(NULL,'+"'"+login+"',md5('"+mdp+"'),'"+mail+"');";
             
             console.log("requete lance : "+reqdb);
             

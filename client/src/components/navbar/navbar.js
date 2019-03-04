@@ -55,11 +55,10 @@ class Navigbar extends Component {
             
             else {
               this.onLoginSuccess(email);
-            }  
+            }
         });
     }
     this.finishLoading();
-    
   }
 
   onRegister() {
@@ -182,7 +181,7 @@ class Navigbar extends Component {
 
   render() {
 
-    const loggedIn = this.state.loggedIn
+    const loggedIn = this.state.loggedIn;
     const isLoading = this.state.loading;
 
     return (
@@ -196,10 +195,17 @@ class Navigbar extends Component {
           <li><Link to="/apropos">A propos</Link></li>
 
         </Nav>
-        <Form inline>
-          <Button onClick={() => this.openModal()} variant="outline-info">Connexion</Button>
-        </Form>
-        {loggedIn}
+
+        {loggedIn ? (
+          <div className="login">
+            {loggedIn}
+          </div>
+        ) : (
+          <Form inline>
+            <Button onClick={() => this.openModal()} variant="outline-info">Connexion</Button>
+          </Form>
+        )}
+
       </Navbar>
       <br />
 

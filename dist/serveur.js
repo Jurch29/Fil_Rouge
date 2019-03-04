@@ -27,6 +27,7 @@ class Server {
     }
     start() {
         const app = express();
+        var username = null;
         let mariadinstance = new api_mariadb_1.default();
         let mongodbinstance = new api_mongodb_1.default();
         let neo4jinstance = new api_neo4j_1.default();
@@ -45,14 +46,16 @@ class Server {
             return __awaiter(this, void 0, void 0, function* () {
                 res.setHeader('Content-Type', 'text/plain');
                 let result = "success";
-                let login = req.body.login;
+                let mail = req.body.login;
                 let mdp = req.body.mdp;
-                let reqdb = 'SELECT COUNT(*) AS count FROM log WHERE login=' + "'" + login + "'" + ' AND pswd=' + "'" + mdp + "'" + ';';
+                let reqdb = 'SELECT COUNT(*) AS count FROM Utilisateur WHERE mail=' + "'" + mail + "'" + ' AND passwd=' + "md5('" + mdp + "')" + ';';
                 console.log("requete lance : " + reqdb);
                 let data = yield mariadinstance.execquery(reqdb).catch((err) => console.log('Error : ' + err));
                 let auth = data[0].count;
                 if (auth === 0)
                     result = 'failed';
+                else
+                    username = mail;
                 res.send(result);
             });
         });
@@ -60,10 +63,10 @@ class Server {
             return __awaiter(this, void 0, void 0, function* () {
                 res.setHeader('Content-Type', 'text/plain');
                 let result = "success";
-                let login = req.body.login;
+                let mail = req.body.login;
                 let mdp = req.body.mdp;
-                let prenom = req.body.prenom;
-                let reqdb = 'INSERT log VALUES(' + "'" + prenom + "','" + login + "','" + mdp + "');";
+                let login = req.body.prenom;
+                let reqdb = 'INSERT Utilisateur VALUES(NULL,' + "'" + login + "',md5('" + mdp + "'),'" + mail + "');";
                 console.log("requete lance : " + reqdb);
                 let data = yield mariadinstance.execquery(reqdb).catch((err) => console.log('Error : ' + err));
                 res.send(result);
