@@ -55,6 +55,7 @@ class Navigbar extends Component {
             
             else {
               this.onLoginSuccess(res.data);
+              this.props.updateuser(res.data);
             }
         });
     }

@@ -1,50 +1,51 @@
 import React, { Component } from 'react';
-
-import Popup from 'reactjs-popup';
+import Popup from 'react-popup';
 import './acceuil.css';
+import {Button} from 'react-bootstrap';
 
-const Modal =  () => (
-  <Popup trigger={<button className="button"> Chapitre X </button>} modal>
-  {close => (
-    <div className="modal">
-      <button className="close" onClick={close}>
-        &times;
-      </button>
-      <div className="header"> Chapitre X </div>
-      <div className="content">
-        Voulez vou continuer le Chapitre en cours ou recommencer le cours ?
-      </div>
-      <div className="actions">
-      <button
-          className="button"
-          onClick={() => {
-            close()
-          }}
-        >
-          Recommencer
-        </button>
-        <button
-          className="button"
-          onClick={() => {
-            close()
-          }}
-        >
-          Continuer
-        </button>
-      </div>
-    </div>
-  )}
-</Popup>
-)
+
 class Acceuil extends Component {
+
+  OnPopup(){
+    Popup.create({
+      title: null,
+      content: 'Souhaitez vous continuer ce cour ou recommencer ?',
+      buttons: {
+          left: [{
+              text: 'Annuler',
+              className: 'danger',
+              action: function () {
+                  Popup.close();
+              }
+          }],
+          right: [{
+              text: 'Recommencer',
+              key: 'ctrl+enter',
+              action: function () {
+                Popup.close();
+
+              }
+          }, {
+              text: 'Continuer',
+              className: 'success',
+              action: function () {
+
+                  Popup.close();
+              }
+          }]
+      }
+    });  
+  }
+
   render(){
     return(
       <div>
       <h1>Acceuil</h1>
-      <Modal />
+      <p>{this.props.Username}</p>
+      <br></br>
+      <Button variant="primary" onClick={() => this.OnPopup()}>NodeJS</Button>
       </div>
     )
     };
-  
 }
 export default Acceuil;
