@@ -103,7 +103,7 @@ export default class Server {
 
         app.post('/selectAvancement', function(req : any, res : any) {
             res.setHeader('Content-Type', 'application/json');
-            mongodbinstance.selectionAvancement(req.body.Cours,req.body.subject_id)
+            mongodbinstance.selectionAvancement(req.body.user_id,req.body.subject_id)
             .then(function(result:any) {
                 res.send(result);
             })
@@ -122,9 +122,10 @@ export default class Server {
                     res.send(err);
                 });
             }else{
+                console.log("pas connecte");
                 neo4jinstance.selectionCoursCommenceParNeo4j(req.body.Cours)
                 .then(function(result:any) {
-                    mongodbinstance.selectionChapitre(result.id)
+                    mongodbinstance.selectionChapitre(parseInt(result.id))
                     .then(function(result:any) {
                         res.send(result);
                     })

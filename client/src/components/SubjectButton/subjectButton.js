@@ -40,10 +40,9 @@ class SubjectButton extends Component {
   }
 
   clickHandler() {
-    console.log("Cours id : "+this.props.subject_id+"  userid : "+this.props.Username);
+    var self =this;
     if(this.props.Username != null && this.props.Username!=undefined){
-      console.log("connecté");
-      axios({
+        axios({
         method: 'post',
         url: 'http://localhost:4000/selectAvancement',
         headers: {
@@ -56,19 +55,18 @@ class SubjectButton extends Component {
         }
       })
       .then(function(result) {
-        console.log("Avancement result : "+result);
+        
         axios({
           method: 'post',
           url: 'http://localhost:4000/selectChapitre',
           data: {
-            Chapitre: result[0].coursIdChapitre,
+            Chapitre: result.data[0].cours.idChapitre,
             Commence: false
           }
         }).then(function(result){
-          console.log(result.data[0].body);
-          result = result.data;
-          if(result[0].body != null){
-            Popup.plugins().Affiche(this.props.subject_label,result); 
+          result = result.data[0];
+          if(result.body != null){
+            Popup.plugins().Affiche(self.state.label,result); 
           }
         }).catch(function(error){
           console.log('error selectChapitre Avanacement clickHandler '+error);
@@ -78,7 +76,6 @@ class SubjectButton extends Component {
         console.log('error selectAvancement clickHandler '+error);
       });
     }else{
-      console.log("non connecté");
       axios({
         method: 'post',
         url: 'http://localhost:4000/selectChapitre',
@@ -89,12 +86,12 @@ class SubjectButton extends Component {
       })
       .then(function(result) {
         result = result.data;
-        if(result[0].body != null){
-          //REDIRECTION avec la data result[0].body
+        if(result.body != null){
+          //REDIRECTION
         }
       })
       .catch(function(error) {
-        console.log('error selectChapitre clickHandler '+error);
+        console.log('error selectChapitre nonconnecte clickHandler '+error);
       });
     }
   }
@@ -109,7 +106,7 @@ class SubjectButton extends Component {
 Popup.registerPlugin('Affiche', function (Cours, result ) {
   this.create({
     title: Cours,
-    content: 'Voulez vous recommencer ou continuer au chapitre: '+result[0].titre+' ?',
+    content: 'Voulez vous recommencer ou continuer au chapitre: '+result.titre+' ?',
     buttons: {
         left: [{
             text: 'Annuler',
@@ -122,14 +119,14 @@ Popup.registerPlugin('Affiche', function (Cours, result ) {
           text: 'Recommencer',
           action: function () {
 
-          //Invoquer avec la data result[0].body
+          //Invoquer la page Chapitre avec la data result
               Popup.close();
           }
         },{
           text: 'Continuer',
           className: 'success',
           action: function () {
-            //REDIRECTION avec la data result[0].body
+            //REDIRECTION vers la page Chapitre avec la data result
               Popup.close();
           }
       }]

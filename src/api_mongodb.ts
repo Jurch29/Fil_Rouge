@@ -3,17 +3,16 @@ import { json } from "body-parser";
 let mongo = require('mongodb').MongoClient;
 const base ="fil_rouge";
 export default class Mongodb {
-    selectionChapitre(Chapitre: any): any {
+    selectionChapitre(chapitre: any): any {
         return new Promise(function(resolve, reject) { 
             mongo.connect('mongodb://localhost:27017', { "useNewUrlParser" : true }, function(err:any, db:any) {
                 if(err) throw err;
                 let maBase = db.db(base);
-                maBase.collection('Chapitre').find({id:Chapitre},{projection : {_id:0}}).toArray(function(err:any, result:any) {
+                maBase.collection('Chapitre').find({id:chapitre},{projection : {_id:0}}).toArray(function(err:any, result:any) {
                     if(err) {
                         reject(err);
                         db.close();
                     } else { 
-                        console.log(result);
                         resolve(result);
                         db.close();
                     }
@@ -22,37 +21,20 @@ export default class Mongodb {
         });
     }
 
-    selectionAvancement(subject_id: any, userid: any): any {
+    selectionAvancement(user_id: any, subject_id: any): any {
         return new Promise(function(resolve, reject) {
-            new Promise(function(resolve1, reject1) {
-                
                 mongo.connect('mongodb://localhost:27017', { "useNewUrlParser" : true }, function(err:any, db:any) {
                     if(err) throw err;
                     let maBase = db.db(base);
-                    maBase.collection('Utilisateur').aggregate([{$unwind:"$cours"},{$match:{id:userid,"cours.idcours":subject_id}}]).toArray(function(err:any, result:any) {
-                        if(err) {
-                            reject1(err);
-                        } else { 
-                            console.log(result);
-                            resolve1(result);
-                            db.close();
-                        }
+                        maBase.collection('Utilisateur').aggregate([{$unwind:"$cours"},{$match:{id:user_id,"cours.idcours":parseInt(subject_id)}}]).toArray(function(err:any, result:any) {
+                            if(err) {
+                                reject(err);
+                            } else {
+                               reject(result);
+                            }
+                        });
                     });
-                })
-            });
-            mongo.connect('mongodb://localhost:27017', { "useNewUrlParser" : true }, function(err:any, db:any) {
-                if(err) throw err;
-                let maBase = db.db(base);
-                maBase.collection('Chapitre').find({id:subject_id},{projection : {_id:0}}).toArray(function(err2:any, result2:any) {
-                    if(err2) {
-                        reject(err2);
-                    } else { 
-                        resolve(result2);
-                    }
-                });   
-                db.close();
-            })
-        });
+                });
     }
 
     inserer(monDocument: any,collection:any) {

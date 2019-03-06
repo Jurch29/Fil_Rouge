@@ -94,6 +94,29 @@ class neo4j {
         return new Promise(function (resolve, reject) {
             let driver = neo.driver('bolt://localhost:7687', neo.auth.basic(username, passwd));
             let session = driver.session();
+            console.log(data);
+            session.run('MATCH (cours:Cours)-[r:COMMENCE_PAR]->(chapitre:Chapitre) WHERE cours.id = {cours_id} RETURN chapitre;', {
+                cours_id: data
+            })
+                .then(function (result) {
+                if (result.records[0] == null) {
+                    resolve({});
+                }
+                else {
+                    resolve(result.records[0]._fields[0].properties);
+                }
+                driver.close();
+            })
+                .catch(function (error) {
+                reject(error);
+                driver.close();
+            });
+        });
+    }
+    selectionIdChapitreNeo4j(data) {
+        return new Promise(function (resolve, reject) {
+            let driver = neo.driver('bolt://localhost:7687', neo.auth.basic(username, passwd));
+            let session = driver.session();
             session.run('MATCH (cours:Cours)-[r:COMMENCE_PAR]->(chapitre:Chapitre) WHERE cours.id = {cours_id} RETURN chapitre;', {
                 cours_id: data
             })
