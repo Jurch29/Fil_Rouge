@@ -21,7 +21,6 @@ export default class Server {
     start() {
 
         const app = express();
-        var username = null;
         let mariadinstance = new Mariadb();
         let mongodbinstance = new Mongodb();
         let neo4jinstance = new neo4j();
@@ -47,7 +46,7 @@ export default class Server {
             let mail = req.body.login;
             let mdp = req.body.mdp;
 
-            let reqdb = 'SELECT COUNT(*) AS count,username FROM Utilisateur WHERE mail='+"'"+mail+"'"+' AND passwd='+"md5('"+mdp+"')"+';';
+            let reqdb = 'SELECT COUNT(*) AS count,id,username FROM Utilisateur WHERE mail='+"'"+mail+"'"+' AND passwd='+"md5('"+mdp+"')"+';';
             
             console.log("requete lance : "+reqdb);
             
@@ -58,8 +57,7 @@ export default class Server {
                 result = 'failed';
                 res.send(result);
             }else{
-                username = mail;
-                res.send(data[0].username);
+                res.send(data[0]);
             }
         });
 
@@ -81,8 +79,65 @@ export default class Server {
             res.send(result);
         });
 
+        app.post('/subjects', function(req : any, res : any) {
+            res.setHeader('Content-Type', 'application/json');
+            neo4jinstance.selectionTousCoursNeo4j()
+            .then(function(result:any) {
+                res.send(result);
+            })
+            .catch(function(err:any) {
+                res.send(err);
+            });
+        });
 
+        app.post('/subjectStartBy', function(req : any, res : any) {
+            res.setHeader('Content-Type', 'application/json');
+            neo4jinstance.selectionCoursCommenceParNeo4j(req.body.subject_id)
+            .then(function(result:any) {
+                res.send(result);
+            })
+            .catch(function(err:any) {
+                res.send(err);
+            });
+        });
 
+        app.post('/selectAvancement', function(req : any, res : any) {
+            res.setHeader('Content-Type', 'application/json');
+            mongodbinstance.selectionAvancement(req.body.Cours,req.body.subject_id)
+            .then(function(result:any) {
+                res.send(result);
+            })
+            .catch(function(err:any) {
+                res.send(err);
+            });
+        });
+        app.post('/selectChapitre', function(req : any, res : any) {
+            res.setHeader('Content-Type', 'application/json');
+            if(!req.body.Commence){
+                mongodbinstance.selectionChapitre(req.body.Chapitre)
+                .then(function(result:any) {
+                    res.send(result);
+                })
+                .catch(function(err:any) {
+                    res.send(err);
+                });
+            }else{
+                neo4jinstance.selectionCoursCommenceParNeo4j(req.body.Cours)
+                .then(function(result:any) {
+                    mongodbinstance.selectionChapitre(result.id)
+                    .then(function(result:any) {
+                        res.send(result);
+                    })
+                    .catch(function(err:any) {
+                        res.send(err);
+                    });
+                })
+                .catch(function(err:any) {
+                    res.send(err);
+                });
+            }
+        });
+        
         /*
         app.get('/', function(req: Request, res : Response){
             res.writeHead(200, {

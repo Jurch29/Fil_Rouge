@@ -203,3 +203,11 @@
       margin-top: 10px;
   }
 }
+.tableSubject {
+    text-align: center;
+    margin: auto;
+}
+
+.buttonSubject {
+    padding: 50px;
+}

@@ -12,9 +12,9 @@ const mariadb = require('mariadb');
 const pool = mariadb.createPool({
     host: '127.0.0.1',
     port: '3306',
-    user: 'ju',
-    password: 'ju',
-    database: 'ju1',
+    user: 'ubo',
+    password: 'ubo',
+    database: 'fil_rouge',
     connectionLimit: 50
 });
 class Mariadb {

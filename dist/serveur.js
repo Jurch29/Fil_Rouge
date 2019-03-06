@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
-};
+}
 Object.defineProperty(exports, "__esModule", { value: true });
 const express = require('express');
 let fs = require('fs');
@@ -27,7 +27,6 @@ class Server {
     }
     start() {
         const app = express();
-        var username = null;
         let mariadinstance = new api_mariadb_1.default();
         let mongodbinstance = new api_mongodb_1.default();
         let neo4jinstance = new api_neo4j_1.default();
@@ -48,7 +47,7 @@ class Server {
                 let result = "success";
                 let mail = req.body.login;
                 let mdp = req.body.mdp;
-                let reqdb = 'SELECT COUNT(*) AS count,username FROM Utilisateur WHERE mail=' + "'" + mail + "'" + ' AND passwd=' + "md5('" + mdp + "')" + ';';
+                let reqdb = 'SELECT COUNT(*) AS count,id,username FROM Utilisateur WHERE mail=' + "'" + mail + "'" + ' AND passwd=' + "md5('" + mdp + "')" + ';';
                 console.log("requete lance : " + reqdb);
                 let data = yield mariadinstance.execquery(reqdb).catch((err) => console.log('Error : ' + err));
                 let auth = data[0].count;
@@ -57,8 +56,7 @@ class Server {
                     res.send(result);
                 }
                 else {
-                    username = mail;
-                    res.send(data[0].username);
+                    res.send(data[0]);
                 }
             });
         });
@@ -74,6 +72,63 @@ class Server {
                 let data = yield mariadinstance.execquery(reqdb).catch((err) => console.log('Error : ' + err));
                 res.send(result);
             });
+        });
+        app.post('/subjects', function (req, res) {
+            res.setHeader('Content-Type', 'application/json');
+            neo4jinstance.selectionTousCoursNeo4j()
+                .then(function (result) {
+                res.send(result);
+            })
+                .catch(function (err) {
+                res.send(err);
+            });
+        });
+        app.post('/subjectStartBy', function (req, res) {
+            res.setHeader('Content-Type', 'application/json');
+            neo4jinstance.selectionCoursCommenceParNeo4j(req.body.subject_id)
+                .then(function (result) {
+                res.send(result);
+            })
+                .catch(function (err) {
+                res.send(err);
+            });
+        });
+        app.post('/selectAvancement', function (req, res) {
+            res.setHeader('Content-Type', 'application/json');
+            mongodbinstance.selectionAvancement(req.body.Cours, req.body.subject_id)
+                .then(function (result) {
+                res.send(result);
+            })
+                .catch(function (err) {
+                res.send(err);
+            });
+        });
+        app.post('/selectChapitre', function (req, res) {
+            res.setHeader('Content-Type', 'application/json');
+            if (!req.body.Commence) {
+                mongodbinstance.selectionChapitre(req.body.Chapitre)
+                    .then(function (result) {
+                    res.send(result);
+                })
+                    .catch(function (err) {
+                    res.send(err);
+                });
+            }
+            else {
+                neo4jinstance.selectionCoursCommenceParNeo4j(req.body.Cours)
+                    .then(function (result) {
+                    mongodbinstance.selectionChapitre(result.id)
+                        .then(function (result) {
+                        res.send(result);
+                    })
+                        .catch(function (err) {
+                        res.send(err);
+                    });
+                })
+                    .catch(function (err) {
+                    res.send(err);
+                });
+            }
         });
         /*
         app.get('/', function(req: Request, res : Response){

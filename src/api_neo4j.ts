@@ -1,10 +1,11 @@
 let neo = require('neo4j-driver').v1;
-
+const passwd ="ubo";
+const username ="neo4j"
 export default class neo4j{
 
     insererNoeud(data:any) {
         return new Promise(function(resolve, reject) {
-            let driver = neo.driver('bolt://localhost:7687', neo.auth.basic('neo4j', 'ju'));
+            let driver = neo.driver('bolt://localhost:7687', neo.auth.basic(username, passwd));
             let session = driver.session();
             session.run(
                 'CREATE (n:Cours {data}) RETURN n.id',
@@ -23,7 +24,7 @@ export default class neo4j{
 
     selectionnerNoeud(data:any) {
         return new Promise(function(resolve, reject) {
-            let driver = neo.driver('bolt://localhost:7687', neo.auth.basic('neo4j', 'ju'));
+            let driver = neo.driver('bolt://localhost:7687', neo.auth.basic(username, passwd));
             let session = driver.session();
             session.run(
                 'MATCH (n:Cours) WHERE n.name = {name} RETURN n',
@@ -42,7 +43,7 @@ export default class neo4j{
 
     insererRelationChapitreCours(maSelection:any, maRelation:any) {
         return new Promise(function(resolve, reject) {
-            let driver = neo.driver('bolt://localhost:7687', neo.auth.basic('neo4j', 'ju'));
+            let driver = neo.driver('bolt://localhost:7687', neo.auth.basic(username, passwd));
             let session = driver.session();
             session.run(
                 'MATCH (n1), (n2) WHERE n1.id = {id1} AND n2.id = {id2} CREATE (n1)-[r:RELATION{relation}]->(n2) RETURN n1, n2, r',
@@ -62,10 +63,9 @@ export default class neo4j{
             });
         });
     }
-
     selectionChapitreCoursNeo4j(data:any) {
         return new Promise(function(resolve, reject) {
-            let driver = neo.driver('bolt://localhost:7687', neo.auth.basic('neo4j', 'ju'));
+            let driver = neo.driver('bolt://localhost:7687', neo.auth.basic(username, passwd));
             let session = driver.session();
             session.run(
                 'MATCH (n1)-[r:RELATION]->(n2) WHERE r.name = {relationName} AND n2.name = {coursName} RETURN n1;',
@@ -76,6 +76,51 @@ export default class neo4j{
             )
             .then(function(result:any) {
                 resolve(result.records);
+                driver.close();
+            })
+            .catch(function(error:any) {
+                reject(error);
+                driver.close();
+            });
+        });
+    }
+    selectionTousCoursNeo4j() {
+        return new Promise(function(resolve, reject) {
+            let driver = neo.driver('bolt://localhost:7687', neo.auth.basic(username, passwd));
+            let session = driver.session();
+            session.run(
+                'MATCH (cours:Cours) RETURN cours;'
+            )
+            .then(function(result:any) {
+                let donnees = [];
+                for(let i = 0; i < result.records.length; i++) {
+                    donnees.push(result.records[i]._fields[0].properties);
+                }
+                resolve(donnees);
+                driver.close();
+            })
+            .catch(function(error:any) {
+                reject(error);
+                driver.close();
+            });
+        });
+    }
+    selectionCoursCommenceParNeo4j (data:any) {
+        return new Promise(function(resolve, reject) {
+            let driver = neo.driver('bolt://localhost:7687', neo.auth.basic(username, passwd));
+            let session = driver.session();
+            session.run(
+                'MATCH (cours:Cours)-[r:COMMENCE_PAR]->(chapitre:Chapitre) WHERE cours.id = {cours_id} RETURN chapitre;',
+                {
+                    cours_id : data
+                }
+            )
+            .then(function(result:any) {
+                if(result.records[0] == null) {
+                    resolve({});
+                } else {
+                    resolve(result.records[0]._fields[0].properties);
+                }
                 driver.close();
             })
             .catch(function(error:any) {
