@@ -84,7 +84,7 @@ class SubjectButton extends Component {
         }).then(function(result){
           result = result.data[0];
           if(result.body != null){
-            Popup.plugins().Affiche(self.state.label,result); 
+            Popup.plugins().Affiche(self.state.label,result,self.state.Username); 
           }
         }).catch(function(error){
           console.log('error selectChapitre Avancement clickHandler '+error);
@@ -126,7 +126,7 @@ class SubjectButton extends Component {
   }
 }
 
-Popup.registerPlugin('Affiche', function (Cours, result ) {
+Popup.registerPlugin('Affiche', function (Cours, result, user_id) {
   this.create({
     title: Cours,
     content: 'Voulez vous recommencer ou continuer au chapitre: '+result.titre+' ?',
@@ -157,7 +157,7 @@ Popup.registerPlugin('Affiche', function (Cours, result ) {
               
               history.push({
                 pathname: '/chapitre',
-                state: { detail: result.body }
+                state: { detail: result.body, userid:user_id }
               })
           }
       }]

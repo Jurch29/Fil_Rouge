@@ -25,7 +25,6 @@ class Acceuil extends Component {
       this.child[4].method(this.state.Username);
       this.child[5].method(this.state.Username);
     });
-
   }
 
   componentWillMount() {
