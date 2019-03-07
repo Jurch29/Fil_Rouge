@@ -10,14 +10,14 @@ class chapitre extends Component {
         let cours =this.props.location.state.coursid;
         let user =this.props.location.state.userid;
         this.state = {
-        Username: user,
-        body : detail.body,
-        titre : detail.titre,
-        auteur : detail.auteur,
-        idChapitre : detail.id,
-        idCours: cours,
-        next : null,
-        menu : null
+            Username: user,
+            body : detail.body,
+            titre : detail.titre,
+            auteur : detail.auteur,
+            idChapitre : detail.id,
+            idCours: cours,
+            next : null,
+            menu : null
         }
         this.clickHandler = this.clickHandler.bind(this);
     }
@@ -53,7 +53,23 @@ class chapitre extends Component {
         });
     }
     clickHandler(){
-        
+        let self=this;
+        console.log(self.state.Username);
+        axios({
+            method: 'post',
+            url: 'http://localhost:4000/avancement',
+            data: {
+                user_id: self.state.Username,
+                idcours: self.state.idCours,
+                idChapitre: self.state.idChapitre
+            }
+        })
+        .then(function(result) {
+           console.log(result);
+        })
+        .catch(function(error) {
+            console.log('error chapite componentWillMount '+error);
+        });
     }
   render(){
       return(

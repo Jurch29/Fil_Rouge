@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 let neo = require('neo4j-driver').v1;
-const passwd = "ju";
+const passwd = "ubo";
 const username = "neo4j";
 class neo4j {
     insererNoeud(data) {

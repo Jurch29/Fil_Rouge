@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
-};
+}
 Object.defineProperty(exports, "__esModule", { value: true });
 const express = require('express');
 let fs = require('fs');
@@ -69,7 +69,35 @@ class Server {
                 let reqdb = 'INSERT Utilisateur VALUES(NULL,' + "'" + login + "',md5('" + mdp + "'),'" + mail + "');";
                 console.log("requete lance : " + reqdb);
                 let data = yield mariadinstance.execquery(reqdb).catch((err) => console.log('Error : ' + err));
+                let reqdb2 = 'SELECT COUNT(*) AS count,id,username FROM Utilisateur WHERE mail=' + "'" + mail + "'" + ' AND passwd=' + "md5('" + mdp + "')" + ';';
+                let data2 = yield mariadinstance.execquery(reqdb2).catch((err) => console.log('Error : ' + err));
+                console.log(data2[0]);
+                let document = { id: data2[0].id, cours: [] };
+                mongodbinstance.inserer(document, 'Utilisateur')
+                    .then(function (result) {
+                })
+                    .catch(function (err) {
+                    res.send(err);
+                });
                 res.send(result);
+            });
+        });
+        app.post('/avancement', function (req, res) {
+            res.setHeader('Content-Type', 'application/json');
+            let selection = { id: parseInt(req.body.user_id), "cours.idcours": parseInt(req.body.idcours) };
+            let changement = { $set: { "cours.$.idChapitre": parseInt(req.body.idChapitre) } };
+            console.log(changement);
+            mongodbinstance.modifier(selection, changement, "Utilisateur").then(function (result) {
+                res.send(result);
+            }).catch(function (err) {
+                let selection = { id: parseInt(req.body.user_id) };
+                let changement = { $push: { cours: { idcours: parseInt(req.body.idcours), idChapitre: parseInt(req.body.idChapitre) } } };
+                mongodbinstance.modifier(selection, changement, 'Utilisateur')
+                    .then(function (result) {
+                    res.send(result);
+                }).catch(function (err) {
+                    res.send(err);
+                });
             });
         });
         app.post('/subjects', function (req, res) {

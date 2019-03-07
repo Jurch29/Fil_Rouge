@@ -37,22 +37,44 @@ class Acceuil extends Component {
       }
     })
     .then(res => {
-      axios({
-        method: 'post',
-        url: 'http://localhost:4000/selectChapitre',
-        data: {
-          Chapitre: res.data[0].cours.idChapitre,
-          Commence: false
-        }
-      }).then(res => {
-        
-        let resultat = res.data[0];
-        if(resultat.body != null){
-          Popup.plugins().Affiche(value2,resultat,this.state.Username,value); 
-        }
-      }).catch(function(error){
-        console.log('error selectChapitre Avancement clickHandler '+error);
-      });
+      if(res.data[0]===undefined){
+        axios({
+          method: 'post',
+          url: 'http://localhost:4000/selectChapitre',
+          data: {
+            Cours: value,
+            Commence : true
+          }
+        })
+        .then(res => {
+          let result = res.data[0];
+          if(result.body != null){
+            history.push({
+              pathname: '/chapitre',
+              state: { detail: result,  userid:this.state.Username, coursid:value }
+            })
+          }
+        }).catch(function(error){
+            console.log('error selectChapitre Avancement clickHandler '+error);
+        });
+      }else{
+        axios({
+          method: 'post',
+          url: 'http://localhost:4000/selectChapitre',
+          data: {
+            Chapitre: res.data[0].cours.idChapitre,
+            Commence: false
+          }
+        }).then(res => {
+          
+          let resultat = res.data[0];
+          if(resultat.body != null){
+            Popup.plugins().Affiche(value2,resultat,this.state.Username,value); 
+          }
+        }).catch(function(error){
+          console.log('error selectChapitre Avancement clickHandler '+error);
+        });
+      }
     })
     .catch(function(error) {
       console.log('error selectAvancement clickHandler '+error);
@@ -145,10 +167,26 @@ Popup.registerPlugin('Affiche', function (Cours,result,user_id,cours_id) {
         right: [{
           text: 'Recommencer',
           action: function () {
-            history.push({
-              pathname: '/chapitre',
-              state: { detail: result, userid:user_id, coursid:cours_id }
+            axios({
+              method: 'post',
+              url: 'http://localhost:4000/selectChapitre',
+              data: {
+                Cours: cours_id,
+                Commence : true
+              }
             })
+            .then(res => {
+              let result = res.data[0];
+              if(result.body != null){
+                history.push({
+                  pathname: '/chapitre',
+                  state: { detail: result,  userid:user_id, coursid:cours_id }
+                })
+              }
+            })
+            .catch(function(error) {
+              console.log('error popup recommencer '+error);
+            });
               Popup.close();
           }
         },{
