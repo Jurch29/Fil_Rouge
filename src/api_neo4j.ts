@@ -204,7 +204,31 @@ export default class neo4j{
             let driver = neo.driver('bolt://localhost:7687', neo.auth.basic(username, passwd));
             let session = driver.session();
             session.run(
-                'MATCH (chapitre1:Chapitre),(chapitre:Chapitre) Where chapitre.id={chapitre_id} MATCH (chapitre1)-[a:SUIVI_PAR]-(chapitre) RETURN chapitre',
+                'MATCH (chapitre1:Chapitre)-[SUIVI_PAR]->(chapitre2:Chapitre) WHERE chapitre1.id={chapitre_id} RETURN chapitre2',
+                {
+                    chapitre_id : data
+                }
+            )
+            .then(function(result:any) {
+                if(result.records[0] == null) {
+                    resolve({});
+                } else {
+                    resolve(result.records[0]._fields[0].properties);
+                }
+                driver.close();
+            })
+            .catch(function(error:any) {
+                reject(error);
+                driver.close();
+            });
+        });
+    }
+    selectionChapitrePrecedantNeo4j(data:any) {
+        return new Promise(function(resolve, reject) {
+            let driver = neo.driver('bolt://localhost:7687', neo.auth.basic(username, passwd));
+            let session = driver.session();
+            session.run(
+                'MATCH (chapitre1:Chapitre)-[SUIVI_PAR]->(chapitre2:Chapitre) WHERE chapitre2.id={chapitre_id} RETURN chapitre1',
                 {
                     chapitre_id : data
                 }

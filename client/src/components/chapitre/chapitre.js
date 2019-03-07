@@ -10,14 +10,13 @@ class chapitre extends Component {
         let cours =this.props.location.state.coursid;
         let user =this.props.location.state.userid;
         this.state = {
-        Username: user,
-        body : detail.body,
-        titre : detail.titre,
-        auteur : detail.auteur,
-        idChapitre : detail.id,
-        idCours: cours,
-        next : null,
-        menu : null
+            Username: user,
+            body : detail.body,
+            titre : detail.titre,
+            auteur : detail.auteur,
+            idChapitre : detail.id,
+            idCours: cours,
+            menu : null
         }
         this.clickHandler = this.clickHandler.bind(this);
     }
@@ -52,10 +51,52 @@ class chapitre extends Component {
             console.log('error chapite componentWillMount '+error);
         });
     }
-    clickHandler(){
-        
+    
+    clickHandlerPrevious(){
+        axios({
+            method: 'post',
+            url: 'http://localhost:4000/getPreviousChapitre',
+            data: {
+                chapitre_id: this.state.idCours
+            }
+        })
+        .then(res => {
+            let result = res.data[0];
+            if(result.body != null){
+                history.push({
+                    pathname: '/chapitre',
+                    state: { detail: result,  userid:this.state.Username, coursid:value }
+                })
+            }
+        })
+        .catch(function(error) {
+            console.log('error selectChapitre nonconnecte clickHandler '+error);
+        });
     }
-  render(){
+
+    clickHandlerNext(){
+        axios({
+            method: 'post',
+            url: 'http://localhost:4000/getNextChapitre',
+            data: {
+                chapitre_id: this.state.idCours
+            }
+        })
+        .then(res => {
+            let result = res.data[0];
+            if(result.body != null){
+                history.push({
+                    pathname: '/chapitre',
+                    state: { detail: result,  userid:this.state.Username, coursid:value }
+                })
+            }
+        })
+        .catch(function(error) {
+            console.log('error selectChapitre nonconnecte clickHandler '+error);
+        });
+    }
+
+    render(){
       return(
         <div>
             <div>
@@ -70,12 +111,13 @@ class chapitre extends Component {
                 <div className="lechapitre"dangerouslySetInnerHTML={{__html: this.state.body}}></div>
             </div>
             <br/>
-            <div className="contenantSuivant">
-                <Button className='buttonNext' variant='primary' size='sm' onClick={this.clickHandler} >Suivant</Button>
+            <div className="contenant">
+                <Button className='buttonPrevious' variant='primary' size='sm' onClick={this.clickHandlerPrevious} >Precedant</Button>
+                <Button className='buttonNext' variant='primary' size='sm' onClick={this.clickHandlerNext} >Suivant</Button>
             </div>
         </div>
       )
-  };
+    };
 
 }
 

@@ -159,6 +159,46 @@ export default class Server {
                 res.send(err);
             });
         });
+        app.post('/getPreviousChapitre', function(req : any, res : any) {
+            res.setHeader('Content-Type', 'application/json');
+            neo4jinstance.selectionChapitrePrecedantNeo4j(req.body.chapitre_id)
+            .then(async function(result:any) {
+                if(result.id != null) {
+                    await mongodbinstance.selectionChapitre(parseInt(result.id))
+                    .then(function(resultat:any) {
+                        res.send(resultat);
+                    })
+                    .catch(function(err:any) {
+                        res.send(err);
+                    });
+                } else {
+                    res.send(null);
+                }
+            })
+            .catch(function(err:any) {
+                res.send(err);
+            });
+        });
+        app.post('/getNextChapitre', function(req : any, res : any) {
+            res.setHeader('Content-Type', 'application/json');
+            neo4jinstance.selectionChapitreSuivantNeo4j(req.body.chapitre_id)
+            .then(async function(result:any) {
+                if(result.id != null) {
+                    await mongodbinstance.selectionChapitre(parseInt(result.id))
+                    .then(function(resultat:any) {
+                        res.send(resultat);
+                    })
+                    .catch(function(err:any) {
+                        res.send(err);
+                    });
+                } else {
+                    res.send(null);
+                }
+            })
+            .catch(function(err:any) {
+                res.send(err);
+            });
+        });
         /*
         app.get('/', function(req: Request, res : Response){
             res.writeHead(200, {
