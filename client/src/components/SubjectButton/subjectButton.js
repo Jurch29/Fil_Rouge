@@ -38,7 +38,65 @@ class SubjectButton extends Component {
   }
 
   clickHandler() {
-    this.props.click(this.state.id, this.state.label);
+    var self =this;
+    if(this.state.Username != null){
+        axios({
+        method: 'post',
+        url: 'http://localhost:4000/selectAvancement',
+        headers: {
+            'crossDomain': true,  //For cors errors 
+            'Content-Type': 'application/json'
+        },
+        data: {
+          user_id : this.state.Username,
+          subject_id: this.state.id
+        }
+      })
+      .then(function(result) {
+        
+        axios({
+          method: 'post',
+          url: 'http://localhost:4000/selectChapitre',
+          data: {
+            Chapitre: result.data[0].cours.idChapitre,
+            Commence: false
+          }
+        }).then(function(result){
+          result = result.data[0];
+          if(result.body != null){
+            Popup.plugins().Affiche(self.state.label,result,self.state.Username,self.state.id); 
+          }
+        }).catch(function(error){
+          console.log('error selectChapitre Avancement clickHandler '+error);
+        });
+      })
+      .catch(function(error) {
+        console.log('error selectAvancement clickHandler '+error);
+      });
+    }else{
+      let self =this;
+      console.log(this.state.Username)
+      axios({
+        method: 'post',
+        url: 'http://localhost:4000/selectChapitre',
+        data: {
+          Cours: self.state.id,
+          Commence : true
+        }
+      })
+      .then(function(result) {
+        result = result.data[0];
+        if(result.body != null){
+          history.push({
+            pathname: '/chapitre',
+            state: { detail: result,  userid:self.state.Username, coursid:self.state.id }
+          })
+        }
+      })
+      .catch(function(error) {
+        console.log('error selectChapitre nonconnecte clickHandler '+error);
+      });
+    }
   }
 
   render() {

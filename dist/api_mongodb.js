@@ -81,7 +81,7 @@ class Mongodb {
                 if (err)
                     throw err;
                 let maBase = db.db(base);
-                maBase.collection(collection).updateOne(maSelection, mesChangements, function (err, result) {
+                maBase.collection(JSON.stringify(collection)).updateOne(maSelection, mesChangements, function (err, result) {
                     if (result.result.n == 0) {
                         reject(false);
                     }

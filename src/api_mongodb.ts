@@ -76,7 +76,7 @@ export default class Mongodb {
             mongo.connect('mongodb://localhost:27017', { "useNewUrlParser" : true }, function(err: any, db: any) {
                 if(err) throw err;
                 let maBase = db.db(base);
-                maBase.collection(collection).updateOne(maSelection, mesChangements, function(err :any, result:any) {
+                maBase.collection(JSON.stringify(collection)).updateOne(maSelection, mesChangements, function(err :any, result:any) {
                     if(result.result.n == 0) {
                         reject(false);
                     } else {
