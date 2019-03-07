@@ -48,7 +48,6 @@ export default class Server {
 
             let reqdb = 'SELECT COUNT(*) AS count,id,username FROM Utilisateur WHERE mail='+"'"+mail+"'"+' AND passwd='+"md5('"+mdp+"')"+';';
             
-            console.log("requete lance : "+reqdb);
             
             let data =  await mariadinstance.execquery(reqdb).catch((err) => console.log('Error : '+err));
 
@@ -154,7 +153,6 @@ export default class Server {
                         res.send(err);
                     });
                 }
-                console.log(data);
                 res.send(data);
             })
             .catch(function(err:any) {

@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 let neo = require('neo4j-driver').v1;
-const passwd = "ubo";
+const passwd = "ju";
 const username = "neo4j";
 class neo4j {
     insererNoeud(data) {
@@ -169,6 +169,28 @@ class neo4j {
                 }
                 else {
                     resolve(result.records);
+                }
+                driver.close();
+            })
+                .catch(function (error) {
+                reject(error);
+                driver.close();
+            });
+        });
+    }
+    selectionChapitreSuivantNeo4j(data) {
+        return new Promise(function (resolve, reject) {
+            let driver = neo.driver('bolt://localhost:7687', neo.auth.basic(username, passwd));
+            let session = driver.session();
+            session.run('MATCH (chapitre1:Chapitre),(chapitre:Chapitre) Where chapitre.id={chapitre_id} MATCH (chapitre1)-[a:SUIVI_PAR]-(chapitre) RETURN chapitre', {
+                chapitre_id: data
+            })
+                .then(function (result) {
+                if (result.records[0] == null) {
+                    resolve({});
+                }
+                else {
+                    resolve(result.records[0]._fields[0].properties);
                 }
                 driver.close();
             })

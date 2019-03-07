@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
-}
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express = require('express');
 let fs = require('fs');
@@ -48,7 +48,6 @@ class Server {
                 let mail = req.body.login;
                 let mdp = req.body.mdp;
                 let reqdb = 'SELECT COUNT(*) AS count,id,username FROM Utilisateur WHERE mail=' + "'" + mail + "'" + ' AND passwd=' + "md5('" + mdp + "')" + ';';
-                console.log("requete lance : " + reqdb);
                 let data = yield mariadinstance.execquery(reqdb).catch((err) => console.log('Error : ' + err));
                 let auth = data[0].count;
                 if (auth === 0) {
@@ -147,7 +146,6 @@ class Server {
                             res.send(err);
                         });
                     }
-                    console.log(data);
                     res.send(data);
                 });
             })

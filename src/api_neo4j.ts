@@ -1,5 +1,5 @@
 let neo = require('neo4j-driver').v1;
-const passwd ="ubo";
+const passwd ="ju";
 const username ="neo4j"
 export default class neo4j{
 
