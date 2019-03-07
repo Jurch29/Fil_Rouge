@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
-}
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express = require('express');
 let fs = require('fs');
@@ -115,12 +115,10 @@ class Server {
                 });
             }
             else {
-                console.log("pas connecte");
                 neo4jinstance.selectionCoursCommenceParNeo4j(req.body.Cours)
                     .then(function (result) {
                     mongodbinstance.selectionChapitre(parseInt(result.id))
                         .then(function (result) {
-                        console.log(result);
                         res.send(result);
                     })
                         .catch(function (err) {

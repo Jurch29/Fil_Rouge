@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 let neo = require('neo4j-driver').v1;
-const passwd = "ubo";
+const passwd = "ju";
 const username = "neo4j";
 class neo4j {
     insererNoeud(data) {
@@ -94,7 +94,6 @@ class neo4j {
         return new Promise(function (resolve, reject) {
             let driver = neo.driver('bolt://localhost:7687', neo.auth.basic(username, passwd));
             let session = driver.session();
-            console.log(data);
             session.run('MATCH (cours:Cours)-[r:COMMENCE_PAR]->(chapitre:Chapitre) WHERE cours.id = {cours_id} RETURN chapitre;', {
                 cours_id: data
             })

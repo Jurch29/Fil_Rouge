@@ -111,6 +111,7 @@ export default class Server {
                 res.send(err);
             });
         });
+        
         app.post('/selectChapitre', function(req : any, res : any) {
             res.setHeader('Content-Type', 'application/json');
             if(!req.body.Commence){
@@ -122,7 +123,6 @@ export default class Server {
                     res.send(err);
                 });
             }else{
-                console.log("pas connecte");
                 neo4jinstance.selectionCoursCommenceParNeo4j(req.body.Cours)
                 .then(function(result:any) {
                     mongodbinstance.selectionChapitre(parseInt(result.id))

@@ -4,6 +4,10 @@ import {Button} from 'react-bootstrap';
 import Popup from 'react-popup';
 import axios from 'axios';
 
+import history from '../history';
+
+
+
 class SubjectButton extends Component {
   constructor(props) {
     super(props);
@@ -16,9 +20,23 @@ class SubjectButton extends Component {
     this.clickHandler = this.clickHandler.bind(this);
   }
 
+  componentDidMount() {
+    this.props.onRef(this)
+  }
+  componentWillUnmount() {
+    this.props.onRef(null)
+  }
+
+  method(iduser) {
+    this.setState({
+      Username: iduser,
+    });
+    console.log("on est "+this.state.label)
+  }
+
   componentWillMount() {
+    this.setState({id:'1'});
     let self =this;
-    console.log(self.state.id);
     axios({
       method: 'post',
       url: 'http://localhost:4000/subjectStartBy',
@@ -41,7 +59,7 @@ class SubjectButton extends Component {
 
   clickHandler() {
     var self =this;
-    if(this.props.Username != null && this.props.Username!=undefined){
+    if(this.state.Username != null){
         axios({
         method: 'post',
         url: 'http://localhost:4000/selectAvancement',
@@ -50,8 +68,8 @@ class SubjectButton extends Component {
             'Content-Type': 'application/json'
         },
         data: {
-          user_id : this.props.Username,
-          subject_id: this.props.subject_id
+          user_id : this.state.Username,
+          subject_id: this.state.id
         }
       })
       .then(function(result) {
@@ -69,25 +87,30 @@ class SubjectButton extends Component {
             Popup.plugins().Affiche(self.state.label,result); 
           }
         }).catch(function(error){
-          console.log('error selectChapitre Avanacement clickHandler '+error);
+          console.log('error selectChapitre Avancement clickHandler '+error);
         });
       })
       .catch(function(error) {
         console.log('error selectAvancement clickHandler '+error);
       });
     }else{
+      let self =this;
       axios({
         method: 'post',
         url: 'http://localhost:4000/selectChapitre',
         data: {
-          Cours: this.props.subject_id,
+          Cours: self.state.id,
           Commence : true
         }
       })
       .then(function(result) {
-        result = result.data;
+        result = result.data[0];
         if(result.body != null){
           //REDIRECTION
+          history.push({
+            pathname: '/chapitre',
+            state: { detail: result.body }
+          })
         }
       })
       .catch(function(error) {
@@ -118,16 +141,24 @@ Popup.registerPlugin('Affiche', function (Cours, result ) {
         right: [{
           text: 'Recommencer',
           action: function () {
+            history.push({
+              pathname: '/chapitre',
+              state: { detail: result.body }
+            })
 
-          //Invoquer la page Chapitre avec la data result
               Popup.close();
           }
         },{
           text: 'Continuer',
           className: 'success',
           action: function () {
-            //REDIRECTION vers la page Chapitre avec la data result
+
               Popup.close();
+              
+              history.push({
+                pathname: '/chapitre',
+                state: { detail: result.body }
+              })
           }
       }]
     }

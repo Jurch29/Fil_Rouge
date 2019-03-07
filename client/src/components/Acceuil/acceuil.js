@@ -9,39 +9,83 @@ class Acceuil extends Component {
     super(props);
     this.state = {
       Username: props.Username,
-      subjects : null
+      subjects : null,
     };
+    this.child = []
   }
+
+  componentWillReceiveProps(value) {
+    this.setState({
+      Username: value.Username
+    }, () => {
+      this.child[0].method(this.state.Username);
+      this.child[1].method(this.state.Username);
+      this.child[2].method(this.state.Username);
+      this.child[3].method(this.state.Username);
+      this.child[4].method(this.state.Username);
+      this.child[5].method(this.state.Username);
+    });
+
+  }
+
   componentWillMount() {
-    let self = this;
+    
     axios({
       method: 'post',
       url: 'http://localhost:4000/subjects',
-    })
-    .then(function(result) {
-      result = result.data;
-      let data = [];
-      let iLecture = 0;
-      let iEcriture = 0;
-      while(iLecture < result.length) {
-        if(iLecture === (result.length - 1)) {
-          if((iLecture % 2) === 0) {
-            data[iEcriture] = <tr><td className='buttonSubject' colSpan='2'><SubjectButton Username={self.props.Username} key={iLecture} subject_id={result[iLecture].id} subject_label={result[iLecture].label} /></td></tr>;
-            iEcriture++;
-          }
-        } else {
-          data[iEcriture] = <tr><td className='buttonSubject' ><SubjectButton Username={self.props.Username} key={iLecture} subject_id={result[iLecture].id} subject_label={result[iLecture].label} /></td><td className='buttonSubject' ><SubjectButton Username={self.props.Username} key={iLecture + 1} subject_id={result[iLecture + 1].id} subject_label={result[iLecture + 1].label} /></td></tr>;
-          iEcriture += 2;
-        }
-        iLecture += 2;
+      headers: {
+          'crossDomain': true,  //For cors errors 
+          'Content-Type': 'application/json'
+      },
+      data: {
+         
       }
-      self.setState({subjects : data});
-    })
-    .catch(function(error) {
-      console.log('error Acceuil componentWillMount '+error);
-    });
-  }
+      }).then(res => {
+         
+        
+        let result = res.data;
+        let data = [];
+        let iLecture = 0;
+        let iEcriture = 0;
 
+        while(iLecture < result.length) {
+          if(iLecture === (result.length - 1)) {
+            if((iLecture % 2) === 0) {
+              data[iEcriture] = <tr><td className='buttonSubject' colSpan='2'><SubjectButton onRef={ref => (this.child[1] = ref)} Username={this.props.Username} key={iLecture} subject_id={result[iLecture].id} subject_label={result[iLecture].label} /></td></tr>;
+              iEcriture++;
+            }
+          } else {
+            data[iEcriture] =
+            <table className='tableSubject' key={"t1"}>
+            <tbody key={"tb1"}>
+     
+            <tr>
+              <td className='buttonSubject' ><SubjectButton onRef={ref => (this.child[0] = ref)} Username={this.props.Username} key={"a1"} subject_id={result[iLecture+1].id} subject_label={result[iLecture+1].label} /></td>
+              <td className='buttonSubject' ><SubjectButton onRef={ref => (this.child[1] = ref)} Username={this.props.Username} key={"b1"} subject_id={result[iLecture].id} subject_label={result[iLecture].label} /></td>
+            </tr>
+            <tr>
+              <td className='buttonSubject' ><SubjectButton onRef={ref => (this.child[2] = ref)} Username={this.props.Username} key={"c1"} subject_id={result[iLecture + 2].id} subject_label={result[iLecture + 2].label} /></td>
+              <td className='buttonSubject' ><SubjectButton onRef={ref => (this.child[3] = ref)} Username={this.props.Username} key={"d1"} subject_id={result[iLecture + 3].id} subject_label={result[iLecture + 3].label} /></td>
+            </tr>
+            <tr>
+              <td className='buttonSubject' ><SubjectButton onRef={ref => (this.child[4] = ref)} Username={this.props.Username} key={"e1"} subject_id={result[iLecture + 4].id} subject_label={result[iLecture + 4].label} /></td>
+              <td className='buttonSubject' ><SubjectButton onRef={ref => (this.child[5] = ref)} Username={this.props.Username} key={"f1"} subject_id={result[iLecture + 5].id} subject_label={result[iLecture + 5].label} /></td>
+            </tr>
+         
+            </tbody>
+            </table>
+            ;
+            iEcriture += 6;
+          }
+          
+          iLecture += 6;
+        }
+        
+        this.setState({subjects : data});
+        
+      });
+
+    }
    
   render(){
     return(
@@ -49,11 +93,7 @@ class Acceuil extends Component {
       <div id='contenant'>
         <h1>Acceuil</h1>
         <br/>
-        <table className='tableSubject'>
-          <tbody>
             {this.state.subjects}
-          </tbody>
-        </table>
         </div>
         <div id="contenu">
         </div>
