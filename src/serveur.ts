@@ -138,7 +138,29 @@ export default class Server {
                 });
             }
         });
-        
+        app.post('/getmenu', function(req : any, res : any) {
+            res.setHeader('Content-Type', 'application/json');
+            let data: any[] | never[] = [];
+            neo4jinstance.selectionTousChapitresPourIDCours(req.body.Cours)
+            .then(async function(result:any) {
+                let index=0;
+                for(;index < result.length;index++){
+                    let retour = result[index]._fields[0].properties
+                    await mongodbinstance.selectionChapitre(parseInt(retour.id))
+                    .then(function(resultat:any) {
+                        data[index]=resultat;
+                    })
+                    .catch(function(err:any) {
+                        res.send(err);
+                    });
+                }
+                console.log(data);
+                res.send(data);
+            })
+            .catch(function(err:any) {
+                res.send(err);
+            });
+        });
         /*
         app.get('/', function(req: Request, res : Response){
             res.writeHead(200, {

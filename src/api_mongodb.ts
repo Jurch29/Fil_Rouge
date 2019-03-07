@@ -12,7 +12,7 @@ export default class Mongodb {
                     if(err) {
                         reject(err);
                         db.close();
-                    } else { 
+                    } else {
                         resolve(result);
                         db.close();
                     }

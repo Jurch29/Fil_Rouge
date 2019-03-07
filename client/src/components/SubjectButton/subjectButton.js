@@ -84,7 +84,7 @@ class SubjectButton extends Component {
         }).then(function(result){
           result = result.data[0];
           if(result.body != null){
-            Popup.plugins().Affiche(self.state.label,result,self.state.Username); 
+            Popup.plugins().Affiche(self.state.label,result,self.state.Username,self.state.id); 
           }
         }).catch(function(error){
           console.log('error selectChapitre Avancement clickHandler '+error);
@@ -106,10 +106,9 @@ class SubjectButton extends Component {
       .then(function(result) {
         result = result.data[0];
         if(result.body != null){
-          //REDIRECTION
           history.push({
             pathname: '/chapitre',
-            state: { detail: result.body }
+            state: { detail: result,  userid:self.state.Username, coursid:self.state.id }
           })
         }
       })
@@ -126,7 +125,7 @@ class SubjectButton extends Component {
   }
 }
 
-Popup.registerPlugin('Affiche', function (Cours, result, user_id) {
+Popup.registerPlugin('Affiche', function (Cours, result, user_id,cours_id) {
   this.create({
     title: Cours,
     content: 'Voulez vous recommencer ou continuer au chapitre: '+result.titre+' ?',
@@ -143,22 +142,19 @@ Popup.registerPlugin('Affiche', function (Cours, result, user_id) {
           action: function () {
             history.push({
               pathname: '/chapitre',
-              state: { detail: result.body }
+              state: { detail: result, userid:user_id, coursid:cours_id }
             })
-
               Popup.close();
           }
         },{
           text: 'Continuer',
           className: 'success',
           action: function () {
-
-              Popup.close();
-              
               history.push({
                 pathname: '/chapitre',
-                state: { detail: result.body, userid:user_id }
+                state: { detail: result, userid:user_id , coursid:cours_id }
               })
+              Popup.close();
           }
       }]
     }

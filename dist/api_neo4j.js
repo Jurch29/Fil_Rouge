@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 let neo = require('neo4j-driver').v1;
-const passwd = "ju";
+const passwd = "ubo";
 const username = "neo4j";
 class neo4j {
     insererNoeud(data) {
@@ -125,6 +125,50 @@ class neo4j {
                 }
                 else {
                     resolve(result.records[0]._fields[0].properties);
+                }
+                driver.close();
+            })
+                .catch(function (error) {
+                reject(error);
+                driver.close();
+            });
+        });
+    }
+    selectionIdCoursNeo4j(data) {
+        return new Promise(function (resolve, reject) {
+            let driver = neo.driver('bolt://localhost:7687', neo.auth.basic(username, passwd));
+            let session = driver.session();
+            session.run('MATCH (cours:Cours), (chapitre:Chapitre) WHERE chapitre.id={chapitre_id} MATCH (chapitre)-[a:APPARTIENT_A]-(cours) RETURN cours.id', {
+                chapitre_id: data
+            })
+                .then(function (result) {
+                if (result.records[0] == null) {
+                    resolve({});
+                }
+                else {
+                    resolve(result.records[0]._fields[0].properties);
+                }
+                driver.close();
+            })
+                .catch(function (error) {
+                reject(error);
+                driver.close();
+            });
+        });
+    }
+    selectionTousChapitresPourIDCours(data) {
+        return new Promise(function (resolve, reject) {
+            let driver = neo.driver('bolt://localhost:7687', neo.auth.basic(username, passwd));
+            let session = driver.session();
+            session.run('MATCH (cours:Cours), (chapitre:Chapitre) WHERE cours.id={cours_id} MATCH (chapitre)-[a:APPARTIENT_A]-(cours) RETURN chapitre', {
+                cours_id: data
+            })
+                .then(function (result) {
+                if (result.records[0] == null) {
+                    resolve({});
+                }
+                else {
+                    resolve(result.records);
                 }
                 driver.close();
             })

@@ -1,5 +1,5 @@
 let neo = require('neo4j-driver').v1;
-const passwd ="ju";
+const passwd ="ubo";
 const username ="neo4j"
 export default class neo4j{
 
@@ -137,6 +137,76 @@ export default class neo4j{
                 'MATCH (cours:Cours)-[r:COMMENCE_PAR]->(chapitre:Chapitre) WHERE cours.id = {cours_id} RETURN chapitre;',
                 {
                     cours_id : data
+                }
+            )
+            .then(function(result:any) {
+                if(result.records[0] == null) {
+                    resolve({});
+                } else {
+                    resolve(result.records[0]._fields[0].properties);
+                }
+                driver.close();
+            })
+            .catch(function(error:any) {
+                reject(error);
+                driver.close();
+            });
+        });
+    }
+    selectionIdCoursNeo4j(data:any) {
+        return new Promise(function(resolve, reject) {
+            let driver = neo.driver('bolt://localhost:7687', neo.auth.basic(username, passwd));
+            let session = driver.session();
+            session.run(
+                'MATCH (cours:Cours), (chapitre:Chapitre) WHERE chapitre.id={chapitre_id} MATCH (chapitre)-[a:APPARTIENT_A]-(cours) RETURN cours.id',
+                {
+                    chapitre_id : data
+                }
+            )
+            .then(function(result:any) {
+                if(result.records[0] == null) {
+                    resolve({});
+                } else {
+                    resolve(result.records[0]._fields[0].properties);
+                }
+                driver.close();
+            })
+            .catch(function(error:any) {
+                reject(error);
+                driver.close();
+            });
+        });
+    }
+    selectionTousChapitresPourIDCours(data:any) {
+        return new Promise(function (resolve, reject) {
+            let driver = neo.driver('bolt://localhost:7687', neo.auth.basic(username, passwd));
+            let session = driver.session();
+            session.run('MATCH (cours:Cours), (chapitre:Chapitre) WHERE cours.id={cours_id} MATCH (chapitre)-[a:APPARTIENT_A]-(cours) RETURN chapitre', {
+                cours_id: data
+            })
+                .then(function (result:any) {
+                if (result.records[0] == null) {
+                    resolve({});
+                }
+                else {
+                    resolve(result.records);
+                }
+                driver.close();
+            })
+                .catch(function (error:any) {
+                reject(error);
+                driver.close();
+            });
+        });
+    }
+    selectionChapitreSuivantNeo4j(data:any) {
+        return new Promise(function(resolve, reject) {
+            let driver = neo.driver('bolt://localhost:7687', neo.auth.basic(username, passwd));
+            let session = driver.session();
+            session.run(
+                'MATCH (chapitre1:Chapitre),(chapitre:Chapitre) Where chapitre.id={chapitre_id} MATCH (chapitre1)-[a:SUIVI_PAR]-(chapitre) RETURN chapitre',
+                {
+                    chapitre_id : data
                 }
             )
             .then(function(result:any) {
