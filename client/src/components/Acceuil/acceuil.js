@@ -9,21 +9,20 @@ class Acceuil extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      Username: props.Username,
+      user_id: props.user_id,
       subjects : null,
     };
-    this.child = []
   }
 
   componentWillReceiveProps(value) {
     this.setState({
-      Username: value.Username
+      user_id: value.user_id
     });
   }
 
-  ButtonClicked = (value, value2) => {
+  gotosubject = (subjectid, court) => {
 
-    if(this.state.Username != null){
+    if(this.state.user_id != null){ //utilisateur connecté
       axios({
       method: 'post',
       url: 'http://localhost:4000/selectAvancement',
@@ -32,8 +31,8 @@ class Acceuil extends Component {
           'Content-Type': 'application/json'
       },
       data: {
-        user_id : this.state.Username,
-        subject_id: value
+        user_id : this.state.user_id,
+        subject_id: subjectid
       }
     })
     .then(res => {
@@ -42,7 +41,7 @@ class Acceuil extends Component {
           method: 'post',
           url: 'http://localhost:4000/selectChapitre',
           data: {
-            Cours: value,
+            Cours: subjectid,
             Commence : true
           }
         })
@@ -51,7 +50,7 @@ class Acceuil extends Component {
           if(result.body != null){
             history.push({
               pathname: '/chapitre',
-              state: { detail: result,  userid:this.state.Username, coursid:value }
+              state: { detail: result, userid:this.state.user_id, coursid:subjectid }
             })
           }
         }).catch(function(error){
@@ -69,7 +68,7 @@ class Acceuil extends Component {
           
           let resultat = res.data[0];
           if(resultat.body != null){
-            Popup.plugins().Affiche(value2,resultat,this.state.Username,value); 
+            Popup.plugins().Affiche(court,resultat,this.state.user_id,subjectid); 
           }
         }).catch(function(error){
           console.log('error selectChapitre Avancement clickHandler '+error);
@@ -79,12 +78,12 @@ class Acceuil extends Component {
     .catch(function(error) {
       console.log('error selectAvancement clickHandler '+error);
     });
-  }else{
+  }else{   //utilisateur anonyme
     axios({
       method: 'post',
       url: 'http://localhost:4000/selectChapitre',
       data: {
-        Cours: value,
+        Cours: subjectid,
         Commence : true
       }
     })
@@ -93,7 +92,7 @@ class Acceuil extends Component {
       if(result.body != null){
         history.push({
           pathname: '/chapitre',
-          state: { detail: result,  userid:this.state.Username, coursid:value }
+          state: { detail: result,  userid:this.state.user_id, coursid:subjectid }
         })
       }
     })
@@ -117,11 +116,11 @@ class Acceuil extends Component {
       while(iLecture < result.length) {
         if(iLecture === (result.length - 1)) {
           if((iLecture % 2) === 0) {
-            data[iEcriture] = <tr key={indice++}><td key={indice++} className='buttonSubject' colSpan='2'><SubjectButton click={this.ButtonClicked} key={indice++} subject_id={result[iLecture].id} subject_label={result[iLecture].label} /></td></tr>;
+            data[iEcriture] = <tr key={indice++}><td key={indice++} className='buttonSubject' colSpan='2'><SubjectButton click={this.gotosubject} key={indice++} subject_id={result[iLecture].id} subject_label={result[iLecture].label} /></td></tr>;
             iEcriture++;
           }
         } else {
-          data[iEcriture] = <tr key={indice++}><td key={indice++} className='buttonSubject' ><SubjectButton click={this.ButtonClicked} key={indice++} subject_id={result[iLecture].id} subject_label={result[iLecture].label} /></td><td className='buttonSubject' ><SubjectButton click={this.ButtonClicked} key={iLecture + 1} subject_id={result[iLecture + 1].id} subject_label={result[iLecture + 1].label} /></td></tr>;
+          data[iEcriture] = <tr key={indice++}><td key={indice++} className='buttonSubject' ><SubjectButton click={this.gotosubject} key={indice++} subject_id={result[iLecture].id} subject_label={result[iLecture].label} /></td><td className='buttonSubject' ><SubjectButton click={this.gotosubject} key={iLecture + 1} subject_id={result[iLecture + 1].id} subject_label={result[iLecture + 1].label} /></td></tr>;
           iEcriture += 2;
         }
         iLecture += 2;
@@ -180,7 +179,7 @@ Popup.registerPlugin('Affiche', function (Cours,result,user_id,cours_id) {
               if(result.body != null){
                 history.push({
                   pathname: '/chapitre',
-                  state: { detail: result,  userid:user_id, coursid:cours_id }
+                  state: { detail:result, userid:user_id, coursid:cours_id }
                 })
               }
             })
@@ -195,7 +194,7 @@ Popup.registerPlugin('Affiche', function (Cours,result,user_id,cours_id) {
           action: function () {
               history.push({
                 pathname: '/chapitre',
-                state: { detail: result, userid:user_id , coursid:cours_id }
+                state: { detail:result, userid:user_id , coursid:cours_id }
               })
               Popup.close();
           }
@@ -203,6 +202,5 @@ Popup.registerPlugin('Affiche', function (Cours,result,user_id,cours_id) {
     }
   });
 });
-
 
 export default Acceuil;

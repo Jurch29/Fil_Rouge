@@ -22,10 +22,6 @@ class Navigbar extends Component {
 
   onLogin() {
     this.startLoading();
-    console.log('__onLogin__');
-    console.log('email: ' + document.querySelector('#email').value);
-    console.log('password: ' + document.querySelector('#password').value);
-
     const email = document.querySelector('#email').value;
     const password = document.querySelector('#password').value;
 
@@ -52,11 +48,10 @@ class Navigbar extends Component {
                 error: true
               })
             }
-            
             else {
               console.log(res.data);
               this.onLoginSuccess(res.data.username);
-              this.props.updateuser(res.data.id);
+              this.props.updateuser(res.data.id); //déclenche la méthode updateuser dans le parent (app.js)
             }
         });
     }
@@ -64,10 +59,6 @@ class Navigbar extends Component {
   }
 
   onRegister() {
-    console.log('__onRegister__');
-    console.log('login: ' + document.querySelector('#login').value);
-    console.log('email: ' + document.querySelector('#email').value);
-    console.log('password: ' + document.querySelector('#password').value);
 
     const login = document.querySelector('#login').value;
     const email = document.querySelector('#email').value;
@@ -106,11 +97,7 @@ class Navigbar extends Component {
   }
 
   onRecoverPassword() {
-    console.log('__onFotgottenPassword__');
-    console.log('email: ' + document.querySelector('#email').value);
-
     const email = document.querySelector('#email').value;
-
 
     if (!email) {
       this.setState({

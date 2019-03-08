@@ -5,7 +5,7 @@ import axios from 'axios';
 import history from '../history';
 
 class chapitre extends Component {
-    constructor(props, context) {
+    constructor(props) {
         super(props);
         let detail =this.props.location.state.detail;
         let cours =this.props.location.state.coursid;
@@ -17,8 +17,6 @@ class chapitre extends Component {
             auteur : detail.auteur,
             idChapitre : detail.id,
             idCours: cours,
-            next : null,
-            menu : null,
             is_last: '',
             is_first: ''
         }

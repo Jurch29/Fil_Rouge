@@ -7,7 +7,6 @@ class SubjectButton extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      Username: props.Username,
       id : props.subject_id,
       label : props.subject_label,
       disabled : true
