@@ -21,3 +21,6 @@ Pour lancer le serveur node, placez-vous dans la racine de 'Fil_Rouge' et lancez
 Le serveur aura par défaut le port 4000.
 Pour lancer l'application cliente, placez-vous dans le dossier 'Fil_Rouge/client' et lancez la commande 'sudo npm start'.
 L'application cliente aura par défaut le port 3000.
+
+# Repertoire
+http://github.com/Jurch29/Fil_Rouge
