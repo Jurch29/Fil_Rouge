@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
-}
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express = require('express');
 let fs = require('fs');
@@ -163,11 +163,13 @@ class Server {
             neo4jinstance.selectionTousChapitresPourIDCours(req.body.Cours)
                 .then(function (result) {
                 return __awaiter(this, void 0, void 0, function* () {
+                    console.log(result);
                     let index = 0;
                     for (; index < result.length; index++) {
                         let retour = result[index]._fields[0].properties;
                         yield mongodbinstance.selectionChapitre(parseInt(retour.id))
                             .then(function (resultat) {
+                            console.log(resultat);
                             data[index] = resultat;
                         })
                             .catch(function (err) {

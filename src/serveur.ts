@@ -40,17 +40,13 @@ export default class Server {
 
         app.post('/auth', async function(req : any, res : any) {
             res.setHeader('Content-Type', 'text/plain');
-            
+        
             let result = "success";
-
             let mail = req.body.login;
             let mdp = req.body.mdp;
-
             let reqdb = 'SELECT COUNT(*) AS count,id,username FROM Utilisateur WHERE mail='+"'"+mail+"'"+' AND passwd='+"md5('"+mdp+"')"+';';
-            
-            
+        
             let data =  await mariadinstance.execquery(reqdb).catch((err) => console.log('Error : '+err));
-            
             
             let auth = data[0].count;
             if (auth === 0){
@@ -167,16 +163,19 @@ export default class Server {
                 });
             }
         });
+
         app.post('/getmenu', function(req : any, res : any) {
             res.setHeader('Content-Type', 'application/json');
             let data: any[] | never[] = [];
             neo4jinstance.selectionTousChapitresPourIDCours(req.body.Cours)
             .then(async function(result:any) {
+                console.log(result);
                 let index=0;
                 for(;index < result.length;index++){
                     let retour = result[index]._fields[0].properties
                     await mongodbinstance.selectionChapitre(parseInt(retour.id))
                     .then(function(resultat:any) {
+                        console.log(resultat);
                         data[index]=resultat;
                     })
                     .catch(function(err:any) {
@@ -189,6 +188,7 @@ export default class Server {
                 res.send(err);
             });
         });
+
         app.post('/getPreviousChapitre', function(req : any, res : any) {
             res.setHeader('Content-Type', 'application/json');
             neo4jinstance.selectionChapitrePrecedantNeo4j(req.body.chapitre_id)

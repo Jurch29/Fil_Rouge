@@ -1,11 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 let mongo = require('mongodb').MongoClient;
-const base = "fil_rouge";
+const base = "projet_DBJAAP";
+const host = "obiwan2.univ-brest.fr";
 class Mongodb {
     selectionChapitre(chapitre) {
         return new Promise(function (resolve, reject) {
-            mongo.connect('mongodb://localhost:27017', { "useNewUrlParser": true }, function (err, db) {
+            mongo.connect('mongodb://' + host + ':27017', { "useNewUrlParser": true }, function (err, db) {
                 if (err)
                     throw err;
                 let maBase = db.db(base);
@@ -24,7 +25,7 @@ class Mongodb {
     }
     selectionAvancement(user_id, subject_id) {
         return new Promise(function (resolve, reject) {
-            mongo.connect('mongodb://localhost:27017', { "useNewUrlParser": true }, function (err, db) {
+            mongo.connect('mongodb://' + host + ':27017', { "useNewUrlParser": true }, function (err, db) {
                 if (err)
                     throw err;
                 let maBase = db.db(base);
@@ -41,7 +42,7 @@ class Mongodb {
     }
     inserer(monDocument, collection) {
         return new Promise(function (resolve, reject) {
-            mongo.connect('mongodb://localhost:27017', { "useNewUrlParser": true }, function (err, db) {
+            mongo.connect('mongodb://' + host + ':27017', { "useNewUrlParser": true }, function (err, db) {
                 if (err)
                     throw err;
                 let maBase = db.db(base);
@@ -59,7 +60,7 @@ class Mongodb {
     }
     supprimer(maSelection, collection) {
         return new Promise(function (resolve, reject) {
-            mongo.connect('mongodb://localhost:27017', { "useNewUrlParser": true }, function (err, db) {
+            mongo.connect('mongodb://' + host + ':27017', { "useNewUrlParser": true }, function (err, db) {
                 if (err)
                     throw err;
                 let maBase = db.db(base);
@@ -77,7 +78,7 @@ class Mongodb {
     }
     modifier(maSelection, mesChangements, collection) {
         return new Promise(function (resolve, reject) {
-            mongo.connect('mongodb://localhost:27017', { "useNewUrlParser": true }, function (err, db) {
+            mongo.connect('mongodb://' + host + ':27017', { "useNewUrlParser": true }, function (err, db) {
                 if (err)
                     throw err;
                 let maBase = db.db(base);
@@ -95,7 +96,7 @@ class Mongodb {
     }
     selectionner(maSelection, collection) {
         return new Promise(function (resolve, reject) {
-            mongo.connect('mongodb://localhost:27017', { "useNewUrlParser": true }, function (err, db) {
+            mongo.connect('mongodb://' + host + ':27017', { "useNewUrlParser": true }, function (err, db) {
                 if (err)
                     throw err;
                 let maBase = db.db(base);

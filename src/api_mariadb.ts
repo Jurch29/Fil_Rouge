@@ -2,11 +2,11 @@
 const mariadb = require('mariadb');
 
 const pool = mariadb.createPool({
-    host: '127.0.0.1',
+    host: 'obiwan2.univ-brest.fr',
     port: '3306',
-    user:'ubo', 
-    password: 'ubo',
-    database: 'fil_rouge',
+    user:'zbergnean', 
+    password: '1j2fllc6',
+    database: 'zfm1-zbergnean',
     connectionLimit: 50
 });
 

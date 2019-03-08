@@ -18,7 +18,9 @@ class chapitre extends Component {
             idChapitre : detail.id,
             idCours: cours,
             next : null,
-            menu : null
+            menu : null,
+            is_last: '',
+            is_first: ''
         }
         this.clickHandlerPrevious = this._clickHandlerPrevious.bind(this);
         this.clickHandlerNext = this._clickHandlerNext.bind(this);
@@ -37,6 +39,14 @@ class chapitre extends Component {
             result = result.data;
             let data = [result.length];
             let iLecture=0,conteur=0;
+            result.sort(compare);
+            function compare(elementA,elementB){
+                if(elementA[0].titre < elementB[0].titre)
+                    return-1;
+                if(elementA[0].titre > elementB[0].titre)
+                    return 1;
+                return 0;
+            }
             while(iLecture < result.length) {
                 if(result[iLecture][0].titre===self.state.titre){
                     data[iLecture] = <li key={conteur++} className="Chapitreactuel">{result[iLecture][0].titre}</li>;
@@ -44,15 +54,61 @@ class chapitre extends Component {
                     data[iLecture] = <li key={conteur++}>{result[iLecture][0].titre}</li>;
                 }
                 iLecture ++;
-                
             }
-            data.sort();
             self.setState({menu :data});
+            self.isFirst();
+            self.isLast();
         })
         .catch(function(error) {
             console.log('error chapite componentWillMount '+error);
         });
     }
+
+    isFirst() {
+        let self=this;
+        axios({
+            method: 'post',
+            url: 'http://localhost:4000/getPreviousChapitre',
+            data: {
+                chapitre_id: self.state.idChapitre
+            }
+        })
+        .then(res => {
+            let result = res.data[0];
+            if(result != null){
+                this.setState({is_first : <Button className='buttonNext' variant='primary' size='sm' onClick={this.clickHandlerPrevious} >Precedant</Button>});
+            } else {
+                this.setState({is_first : ''});
+            }
+        })
+        .catch(function(error) {
+            console.log('error selectChapitre nonconnecte clickHandler '+error);
+        });
+    }
+
+
+    isLast() {
+        let self=this;
+        axios({
+            method: 'post',
+            url: 'http://localhost:4000/getNextChapitre',
+            data: {
+                chapitre_id: self.state.idChapitre
+            }
+        })
+        .then(res => {
+            let result = res.data[0];
+            if(result != null){
+                this.setState({is_last : <Button className='buttonNext' variant='primary' size='sm' onClick={this.clickHandlerNext} >Suivant</Button>});
+            } else {
+                this.setState({is_last : ''});
+            }
+        })
+        .catch(function(error) {
+            console.log('error selectChapitre nonconnecte clickHandler '+error);
+        });
+    }
+
     _clickHandlerPrevious(){
         let self=this;
         axios({
@@ -113,7 +169,6 @@ class chapitre extends Component {
                     this.componentWillMount()
                 }
                    
-            
             })
             .catch(function(error) {
                  history.push({
@@ -121,9 +176,7 @@ class chapitre extends Component {
                  })
                 console.log('error selectChapitre nonconnecte clickHandler '+error);
             });
-       
     }
-
 
   render(){
       return(
@@ -141,8 +194,8 @@ class chapitre extends Component {
             </div>
             <br/>
             <div className="contenantSuivant">
-            <Button className='buttonNext' variant='primary' size='sm' onClick={this.clickHandlerPrevious} >Precedant</Button>
-                <Button className='buttonNext' variant='primary' size='sm' onClick={this.clickHandlerNext} >Suivant</Button>
+                {this.state.is_first}
+                {this.state.is_last}
             </div>
         </div>
       )

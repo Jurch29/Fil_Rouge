@@ -99,12 +99,9 @@ class Navigbar extends Component {
             }
             
             else {
-              this.onLoginSuccess(login);
+              this.closeModal();
             }  
         });
-      //this.onLoginSuccess('form');
-
-      
     }
   }
 

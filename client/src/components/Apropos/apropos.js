@@ -22,7 +22,7 @@ class apropos extends Component {
           <p>Décrire le projet.</p>
         </Tab>
         <Tab eventKey="profile" title="Equipe">
-        <p>décrire l'équipe.</p>
+        <p>Décrire l'équipe.</p>
         </Tab>
       </Tabs>
     );
