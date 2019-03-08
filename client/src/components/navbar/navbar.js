@@ -40,7 +40,7 @@ class Navigbar extends Component {
         },
         data: {
             login: email,
-            mdp: password
+            passwd: password
         }
         }).then(res => {
             if (res.data === "failed"){
@@ -79,8 +79,8 @@ class Navigbar extends Component {
         },
         data: {
             login: email,
-            mdp: password,
-            prenom: login
+            passwd: password,
+            firstname: login
         }
         }).then(res => {
             if (res.data === "failed"){
@@ -177,8 +177,8 @@ class Navigbar extends Component {
         <Navbar.Brand href="#home">DB.JAAP</Navbar.Brand>
         <Nav className="mr-auto">
 
-          <li className="acceuil"><Link to="/acceuil">Acceuil</Link></li>
-          <li><Link to="/apropos">A propos</Link></li>
+          <li className="acceuil"><Link to="/home">Acceuil</Link></li>
+          <li><Link to="/about">A propos</Link></li>
 
         </Nav>
 

@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import {Tab, Tabs} from 'react-bootstrap';
-import './apropos.css';
+import './about.css';
 
-class apropos extends Component {
+class About extends Component {
 
   constructor(props, context) {
     super(props, context);
@@ -29,4 +29,4 @@ class apropos extends Component {
   }
 }
 
-export default apropos;
+export default About;

@@ -1,13 +1,13 @@
-import { Request, Response } from 'express'
-const express = require('express')
+import { Request, Response } from 'express';
+const express = require('express');
 let fs = require('fs');
 let body_parser = require('body-parser');
 var utf8 = require('utf8');
 var path = require('path');
 var _ = require('underscore');
 const cors = require('cors');
-import Mariadb from './api_mariadb';
-import Mongodb from './api_mongodb';
+import mariadb from './api_mariadb';
+import mongodb from './api_mongodb';
 import neo4j from './api_neo4j';
 
 export default class Server {
@@ -21,9 +21,9 @@ export default class Server {
     start() {
 
         const app = express();
-        let mariadinstance = new Mariadb();
-        let mongodbinstance = new Mongodb();
-        let neo4jinstance = new neo4j();
+        let mariadb_instance = new mariadb();
+        let mongodb_instance = new mongodb();
+        let neo4j_instance = new neo4j();
 
         app.use(body_parser.urlencoded({    //pour le parsing
             extended : true
@@ -33,8 +33,8 @@ export default class Server {
         // Add headers
 
         var corsOptions = {
-        origin: '*',
-        optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204 
+            origin: '*',
+            optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204 
         }
         app.use(cors(corsOptions));
 
@@ -43,10 +43,10 @@ export default class Server {
         
             let result = "success";
             let mail = req.body.login;
-            let mdp = req.body.mdp;
-            let reqdb = 'SELECT COUNT(*) AS count,id,username FROM Utilisateur WHERE mail='+"'"+mail+"'"+' AND passwd='+"md5('"+mdp+"')"+';';
+            let passwd = req.body.passwd;
+            let request = 'SELECT COUNT(*) AS count, id, username FROM Utilisateur WHERE mail='+"'"+mail+"'"+' AND passwd='+"md5('"+passwd+"')"+';';
         
-            let data =  await mariadinstance.execquery(reqdb).catch((err) => console.log('Error : '+err));
+            let data =  await mariadb_instance.execquery(request).catch((err) => console.log('Error : '+err));
             
             let auth = data[0].count;
             if (auth === 0){
@@ -63,21 +63,24 @@ export default class Server {
             let result = "success";
 
             let mail = req.body.login;
-            let mdp = req.body.mdp;
-            let login = req.body.prenom;
+            let passwd = req.body.passwd;
+            let login = req.body.firstname;
 
-            let reqdb = 'INSERT Utilisateur VALUES(NULL,'+"'"+login+"',md5('"+mdp+"'),'"+mail+"');";
+            let request_1 = 'INSERT Utilisateur VALUES(NULL, '+"'"+login+"', md5('"+passwd+"'), '"+mail+"');";
             
-            console.log("requete lance : "+reqdb);
+            console.log("request : "+request_1);
             
-            let data =  await mariadinstance.execquery(reqdb).catch((err) => console.log('Error : '+err));
+            let data_1 =  await mariadb_instance.execquery(request_1).catch((err) => console.log('Error : '+err));
            
-            let reqdb2 = 'SELECT COUNT(*) AS count,id,username FROM Utilisateur WHERE mail='+"'"+mail+"'"+' AND passwd='+"md5('"+mdp+"')"+';';
-            let data2 =  await mariadinstance.execquery(reqdb2).catch((err) => console.log('Error : '+err));
-            console.log(data2[0])
+            let request_2 = 'SELECT COUNT(*) AS count, id, username FROM Utilisateur WHERE mail='+"'"+mail+"'"+' AND passwd='+"md5('"+passwd+"')"+';';
+            let data_2 =  await mariadb_instance.execquery(request_2).catch((err) => console.log('Error : '+err));
+            console.log(data_2[0]);
             
-            let document = {id:data2[0].id, cours:[]}
-            mongodbinstance.inserer(document,'Utilisateur')
+            let document = {
+                id:data_2[0].id,
+                cours:[]
+            };
+            mongodb_instance.insertDocument(document, 'Utilisateur')
             .then(function(result:any) {
             })
             .catch(function(err:any) {
@@ -86,17 +89,36 @@ export default class Server {
             res.send(result);
         });
 
-        app.post('/avancement', function(req : any, res : any) {
+        app.post('/advancement', function(req : any, res : any) {
             res.setHeader('Content-Type', 'application/json');
-            let selection={id:parseInt(req.body.user_id),"cours.idcours":parseInt(req.body.idcours)}
-            let changement={$set:{"cours.$.idChapitre":parseInt(req.body.idChapitre)}}
-            console.log(changement)
-            mongodbinstance.modifier(selection,changement,"Utilisateur").then(function(result:any) {
+            let selection = {
+                utilisateur_id : parseInt(req.body.user_id),
+                "cours.idcours" : parseInt(req.body.subject_id)
+            };
+            let changes = {
+                $set : {
+                    "cours.$.idChapitre" : parseInt(req.body.chapter_id)
+                }
+            };
+            console.log(changes);
+
+            mongodb_instance.modifyDocument(selection, changes, 'Utilisateur').
+            then(function(result:any) {
                 res.send(result);
-            }).catch(function(err:any) {    
-                let selection={id:parseInt(req.body.user_id)}
-                let changement={$push:{cours:{idcours:parseInt(req.body.idcours),idChapitre:parseInt(req.body.idChapitre)}}}
-                mongodbinstance.modifier(selection,changement,'Utilisateur')
+            })
+            .catch(function(err:any) {    
+                let selection = {
+                    utilisateur_id : parseInt(req.body.user_id)
+                };
+                let changes = {
+                    $push : {
+                        cours : {
+                            cours_id : parseInt(req.body.subject_id),
+                            chapitre_id : parseInt(req.body.chapter_id)
+                        }
+                    }
+                };
+                mongodb_instance.modifyDocument(selection, changes, 'Utilisateur')
                 .then(function(result:any) {
                     res.send(result);
                 }).catch(function(err:any) {
@@ -106,7 +128,7 @@ export default class Server {
         });
         app.post('/subjects', function(req : any, res : any) {
             res.setHeader('Content-Type', 'application/json');
-            neo4jinstance.selectionTousCoursNeo4j()
+            neo4j_instance.selectSubjects()
             .then(function(result:any) {
                 res.send(result);
             })
@@ -117,7 +139,7 @@ export default class Server {
 
         app.post('/subjectStartBy', function(req : any, res : any) {
             res.setHeader('Content-Type', 'application/json');
-            neo4jinstance.selectionCoursCommenceParNeo4j(req.body.subject_id)
+            neo4j_instance.selectSubjectStartBy(req.body.subject_id)
             .then(function(result:any) {
                 res.send(result);
             })
@@ -126,9 +148,9 @@ export default class Server {
             });
         });
 
-        app.post('/selectAvancement', function(req : any, res : any) {
+        app.post('/selectAdvancement', function(req : any, res : any) {
             res.setHeader('Content-Type', 'application/json');
-            mongodbinstance.selectionAvancement(req.body.user_id,req.body.subject_id)
+            mongodb_instance.selectAdvancement(req.body.user_id, req.body.subject_id)
             .then(function(result:any) {
                 res.send(result);
             })
@@ -137,10 +159,10 @@ export default class Server {
             });
         });
         
-        app.post('/selectChapitre', function(req : any, res : any) {
+        app.post('/selectChapter', function(req : any, res : any) {
             res.setHeader('Content-Type', 'application/json');
-            if(!req.body.Commence){
-                mongodbinstance.selectionChapitre(req.body.Chapitre)
+            if(!req.body.start){
+                mongodb_instance.selectChapter(req.body.chapter_id)
                 .then(function(result:any) {
                     res.send(result);
                 })
@@ -148,9 +170,9 @@ export default class Server {
                     res.send(err);
                 });
             }else{
-                neo4jinstance.selectionCoursCommenceParNeo4j(req.body.Cours)
+                neo4j_instance.selectSubjectStartBy(req.body.subject_id)
                 .then(function(result:any) {
-                    mongodbinstance.selectionChapitre(parseInt(result.id))
+                    mongodb_instance.selectChapter(parseInt(result.id))
                     .then(function(result:any) {
                         res.send(result);
                     })
@@ -164,19 +186,19 @@ export default class Server {
             }
         });
 
-        app.post('/getmenu', function(req : any, res : any) {
+        app.post('/getSubjectChaptersList', function(req : any, res : any) {
             res.setHeader('Content-Type', 'application/json');
             let data: any[] | never[] = [];
-            neo4jinstance.selectionTousChapitresPourIDCours(req.body.Cours)
-            .then(async function(result:any) {
-                console.log(result);
+            neo4j_instance.selectSubjectChapters(req.body.subject_id)
+            .then(async function(result_1:any) {
+                console.log(result_1);
                 let index=0;
-                for(;index < result.length;index++){
-                    let retour = result[index]._fields[0].properties
-                    await mongodbinstance.selectionChapitre(parseInt(retour.id))
-                    .then(function(resultat:any) {
-                        console.log(resultat);
-                        data[index]=resultat;
+                for(;index < result_1.length;index++){
+                    let result_2 = result_1[index]._fields[0].properties
+                    await mongodb_instance.selectChapter(parseInt(result_2.id))
+                    .then(function(result_3:any) {
+                        console.log(result_3);
+                        data[index]=result_3;
                     })
                     .catch(function(err:any) {
                         res.send(err);
@@ -189,14 +211,14 @@ export default class Server {
             });
         });
 
-        app.post('/getPreviousChapitre', function(req : any, res : any) {
+        app.post('/getPreviousChapter', function(req : any, res : any) {
             res.setHeader('Content-Type', 'application/json');
-            neo4jinstance.selectionChapitrePrecedantNeo4j(req.body.chapitre_id)
-            .then(async function(result:any) {
-                if(result.id != null) {
-                    await mongodbinstance.selectionChapitre(parseInt(result.id))
-                    .then(function(resultat:any) {
-                        res.send(resultat);
+            neo4j_instance.selectPreviousChapter(req.body.chapter_id)
+            .then(async function(result_1:any) {
+                if(result_1.id != null) {
+                    await mongodb_instance.selectChapter(parseInt(result_1.id))
+                    .then(function(result_2:any) {
+                        res.send(result_2);
                     })
                     .catch(function(err:any) {
                         res.send(err);
@@ -209,14 +231,15 @@ export default class Server {
                 res.send(err);
             });
         });
-        app.post('/getNextChapitre', function(req : any, res : any) {
+
+        app.post('/getNextChapter', function(req : any, res : any) {
             res.setHeader('Content-Type', 'application/json');
-            neo4jinstance.selectionChapitreSuivantNeo4j(req.body.chapitre_id)
-            .then(async function(result:any) {
-                if(result.id != null) {
-                    await mongodbinstance.selectionChapitre(parseInt(result.id))
-                    .then(function(resultat:any) {
-                        res.send(resultat);
+            neo4j_instance.selectNextChapter(req.body.chapter_id)
+            .then(async function(result_1:any) {
+                if(result_1.id != null) {
+                    await mongodb_instance.selectChapter(parseInt(result_1.id))
+                    .then(function(result_2:any) {
+                        res.send(result_2);
                     })
                     .catch(function(err:any) {
                         res.send(err);
@@ -229,148 +252,6 @@ export default class Server {
                 res.send(err);
             });
         });
-        /*
-        app.get('/', function(req: Request, res : Response){
-            res.writeHead(200, {
-                'Content-Type' : 'text/html'
-            });
-            fs.readFile('./html/index.html', (err: Error, data: Buffer) => { 
-                if (err) { 
-                    throw err; 
-                } 
-                res.write(data);
-                res.end(); 
-            });
-        })
-
-        app.post('/selectionnerMongoDB', function(req:any, res:any) {
-            res.setHeader('Content-Type', 'text/plain');
-            console.log('Selection mongoDB');
-            let resultat:any;
-            new Promise(function(resolve, reject) {
-                resultat = mongodbinstance.selectionner(JSON.parse(utf8.decode(JSON.stringify(req.body.maSelection))));
-            });
-            resultat.then(function(result:any) {
-                res.send(result);
-            })
-            .catch(function(err:any, result:any) {
-                res.send("Selection erreur : "+err);
-            });
-        });
-
-        app.post('/insererMongoDB', function(req:any, res:any) {
-            res.setHeader('Content-Type', 'text/plain');
-            console.log('Insertion mongoDB');
-            let resultat:any;
-            new Promise(function(resolve, reject) {
-                resultat = mongodbinstance.inserer(JSON.parse(utf8.decode(JSON.stringify(req.body.monDocument))));
-            });
-            resultat.then(function(result:any) {
-                res.send("Insertion ok");
-            })
-            .catch(function(err:any, result:any) {
-                res.send("insertion erreur");
-            });
-        });
-        
-        app.post('/supprimerMongoDB', function(req:any, res:any) {
-            res.setHeader('Content-Type', 'text/plain');
-            console.log('Suppression mongoDB');
-            let resultat:any;
-            new Promise(function(resolve, reject) {
-                resultat = mongodbinstance.supprimer(JSON.parse(utf8.decode(JSON.stringify(req.body.maSelection))));
-            });
-            resultat.then(function(result:any) {
-                res.send("supression ok");
-            })
-            .catch(function(err:any, result:any) {
-                res.send("suppresion erreur");
-            });
-        });
-        
-        app.post('/modifierMongoDB', function(req:any, res:any) {
-            res.setHeader('Content-Type', 'text/plain');
-            console.log('Modification mongoDB');
-            let resultat:any;
-            new Promise(function(resolve, reject) {
-                resultat = mongodbinstance.modifier(JSON.parse(utf8.decode(JSON.stringify(req.body.maSelection))), JSON.parse(utf8.decode(JSON.stringify(req.body.mesChangements))));
-            });
-            resultat.then(function(result:any) {
-                res.send("modification ok");
-            })
-            .catch(function(err:any, result:any) {
-                res.send("modification erreur");
-            });
-        });
-
-
-        app.post('/insererNoeudNeo4j', function(req:any, res:any) {
-            res.setHeader('Content-Type', 'text/plain');
-            console.log('Insertion noeud');
-            let resultat:any;
-            new Promise(function(resolve, reject) {
-                resultat = neo4jinstance.insererNoeud(req.body.monNoeud);
-            });
-            resultat.then(function(result:any) {
-                res.send(result);
-            })
-            .catch(function(err:any, result:any) {
-                res.send(err+result);
-            });
-        });
-
-        app.post('/selectionnerNoeudNeo4j', function(req:any, res:any) {
-            res.setHeader('Content-Type', 'text/plain');
-            console.log('Selection noeud');
-            let resultat:any;
-            new Promise(function(resolve, reject) {
-                resultat = neo4jinstance.selectionnerNoeud(req.body.maSelection);
-            });
-            resultat.then(function(result:any) {
-                res.send(result);
-            })
-            .catch(function(err:any, result:any) {
-                res.send(err+result);
-            });
-        });
-
-        app.post('/insererRelationChapitreCoursNeo4j', function(req:any, res:any) {
-            res.setHeader('Content-Type', 'text/plain');
-            console.log('Insertion relation noeud');
-            let resultat:any;
-            new Promise(function(resolve, reject) {
-                resultat = neo4jinstance.insererRelationChapitreCours(req.body.maSelection, req.body.maRelation);
-            });
-            resultat.then(function(result:any) {
-                res.send(result);
-            })
-            .catch(function(err:any, result:any) {
-                res.send(err+result);
-            });
-        });
-
-        app.post('/selectionChapitreCoursNeo4j', function(req:any, res:any) {
-            res.setHeader('Content-Type', 'text/plain');
-            console.log('Selection chapitre noeud');
-            let resultat:any;
-            new Promise(function(resolve, reject) {
-                resultat = neo4jinstance.selectionChapitreCoursNeo4j(req.body.maRelation);
-            });
-            resultat.then(function(result:any) {
-                res.send(result);
-            })
-            .catch(function(err:any, result:any) {
-                res.send(err+result);
-            });
-        });
-
-        app.post('/actionmariadb', async function(req : any, res : any) {
-            let data =  await mariadinstance.execquery(req.body.maSelection)
-            console.log("requete lance : "+req.body.maSelection);
-            res.send("Resultat : "+ JSON.stringify(data)); //on recoit un json on renvoie un string
-        });
-
-        */
         
         app.listen(this.port, function() {
             console.log('Serveur démarré (4000)');

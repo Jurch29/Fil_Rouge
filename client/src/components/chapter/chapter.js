@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import './chapitre.css';
+import './chapter.css';
 import {Button} from 'react-bootstrap';
 import axios from 'axios';
 import history from '../history';
 
-class chapitre extends Component {
+class Chapter extends Component {
     constructor(props) {
         super(props);
         let detail =this.props.location.state.detail;
@@ -28,9 +28,9 @@ class chapitre extends Component {
         let self=this;
         axios({
             method: 'post',
-            url: 'http://localhost:4000/getmenu',
+            url: 'http://localhost:4000/getSubjectChaptersList',
             data: {
-                Cours: self.state.idCours
+                subject_id: self.state.idCours
             }
         })
         .then(function(result) {
@@ -58,7 +58,7 @@ class chapitre extends Component {
             self.isLast();
         })
         .catch(function(error) {
-            console.log('error chapite componentWillMount '+error);
+            console.log('error chapter componentWillMount '+error);
         });
     }
 
@@ -66,9 +66,9 @@ class chapitre extends Component {
         let self=this;
         axios({
             method: 'post',
-            url: 'http://localhost:4000/getPreviousChapitre',
+            url: 'http://localhost:4000/getPreviousChapter',
             data: {
-                chapitre_id: self.state.idChapitre
+                chapter_id: self.state.idChapitre
             }
         })
         .then(res => {
@@ -80,7 +80,7 @@ class chapitre extends Component {
             }
         })
         .catch(function(error) {
-            console.log('error selectChapitre nonconnecte clickHandler '+error);
+            console.log('error selectChapter nonconnecte clickHandler '+error);
         });
     }
 
@@ -89,9 +89,9 @@ class chapitre extends Component {
         let self=this;
         axios({
             method: 'post',
-            url: 'http://localhost:4000/getNextChapitre',
+            url: 'http://localhost:4000/getNextChapter',
             data: {
-                chapitre_id: self.state.idChapitre
+                chapter_id: self.state.idChapitre
             }
         })
         .then(res => {
@@ -103,7 +103,7 @@ class chapitre extends Component {
             }
         })
         .catch(function(error) {
-            console.log('error selectChapitre nonconnecte clickHandler '+error);
+            console.log('error selectChapter nonconnecte clickHandler '+error);
         });
     }
 
@@ -111,9 +111,9 @@ class chapitre extends Component {
         let self=this;
         axios({
             method: 'post',
-            url: 'http://localhost:4000/getPreviousChapitre',
+            url: 'http://localhost:4000/getPreviousChapter',
             data: {
-                chapitre_id: self.state.idChapitre
+                chapter_id: self.state.idChapitre
             }
         })
         .then(res => {
@@ -128,9 +128,9 @@ class chapitre extends Component {
         })
         .catch(function(error) {
             history.push({
-             pathname: '/acceuil'
+                pathname: '/home'
             })
-            console.log('error selectChapitre nonconnecte clickHandler '+error);
+            console.log('error selectChapter nonconnecte clickHandler '+error);
         });
     }
 
@@ -138,9 +138,9 @@ class chapitre extends Component {
        
             axios({
                 method: 'post',
-                url: 'http://localhost:4000/getNextChapitre',
+                url: 'http://localhost:4000/getNextChapter',
                 data: {
-                    chapitre_id: this.state.idChapitre
+                    chapter_id: this.state.idChapitre
                 }
             })
             .then(res => {
@@ -152,27 +152,27 @@ class chapitre extends Component {
                     this.setState({idChapitre:result.id})
                     axios({
                         method: 'post',
-                        url: 'http://localhost:4000/avancement',
+                        url: 'http://localhost:4000/advancement',
                         data: {
                             user_id: this.state.Username,
-                            idcours: this.state.idCours,
-                            idChapitre: this.state.idChapitre
+                            subject_id: this.state.idCours,
+                            chapter_id: this.state.idChapitre
                         }
                     })
                     .then(function(result) { 
                     })
                     .catch(function(error) {
-                        console.log('error chapite componentWillMount '+error);
+                        console.log('error chapter componentWillMount '+error);
                     });
                     this.componentWillMount()
                 }
                    
             })
             .catch(function(error) {
-                 history.push({
-                  pathname: '/acceuil'
-                 })
-                console.log('error selectChapitre nonconnecte clickHandler '+error);
+                history.push({
+                    pathname: '/home'
+                })
+                console.log('error selectChapter nonconnecte clickHandler '+error);
             });
     }
 
@@ -201,4 +201,4 @@ class chapitre extends Component {
 
 }
 
-export default chapitre;
+export default Chapter;

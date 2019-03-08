@@ -16,7 +16,15 @@
     "typescript": "^3.3.3"
   },
   "dependencies": {
+    "@types/body-parser": "^1.17.0",
+    "@types/express": "^4.16.1",
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "mariadb": "^2.0.3",
     "mongodb": "^3.1.13",
-    "neo4j": "^2.0.0-RC2"
+    "neo4j": "^2.0.0-RC2",
+    "neo4j-driver": "^1.7.3",
+    "utf8": "^3.0.0"
   }
 }

@@ -3,11 +3,11 @@ import './App.css';
 import { Router, Route, Switch } from 'react-router-dom';
 import history from './components/history';
 
-import Acceuil from "./components/Acceuil/acceuil";
-import apropos from "./components/Apropos/apropos";
-import Notfound from "./components/notfound/notfound";
+import Home from "./components/home/home";
+import About from "./components/about/about";
+import Not_found from "./components/not_found/not_found";
 import Navigbar from "./components/navbar/navbar";
-import chapitre from "./components/chapitre/chapitre";
+import Chapter from "./components/chapter/chapter";
 
 class App extends Component {
 
@@ -30,16 +30,16 @@ class App extends Component {
 
       <Router history={history}>
       <div>
-          <Navigbar updateuser={this.updateuser} />
+          <Navigbar updateuser={this.update_user} />
           <Switch>
-            <Route exact path="/" component={Acceuil} />
-            <Route path="/apropos" component={apropos} />
-            <Route path="/chapitre" component={chapitre} />
+            <Route exact path="/" component={Home} />
+            <Route path="/about" component={About} />
+            <Route path="/chapter" component={Chapter} />
             <Route 
-            path="/acceuil" 
-            render={(props) => <Acceuil {...props} user_id={userid}/>} 
+            path="/home" 
+            render={(props) => <Home {...props} user_id={userid}/>} 
             />
-            <Route component={Notfound} />
+            <Route component={Not_found} />
           </Switch>
         </div>
       </Router>

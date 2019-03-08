@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './subjectButton.css';
+import './subject_button.css';
 import {Button} from 'react-bootstrap';
 import axios from 'axios';
 
@@ -32,7 +32,7 @@ class SubjectButton extends Component {
       }
     })
     .catch(function(error) {
-      console.log('error SubjectButton componentWillMount '+error);
+      console.log('error Subject_Button componentWillMount '+error);
     });
   }
 

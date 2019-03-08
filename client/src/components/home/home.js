@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import './acceuil.css';
-import SubjectButton from '../SubjectButton/subjectButton.js';
+import './home.css';
+import SubjectButton from '../subject_button/subject_button';
 import axios from 'axios';
 import Popup from 'react-popup';
 import history from '../history';
 
-class Acceuil extends Component {
+class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -25,7 +25,7 @@ class Acceuil extends Component {
     if(this.state.user_id != null){ //utilisateur connecté
       axios({
       method: 'post',
-      url: 'http://localhost:4000/selectAvancement',
+      url: 'http://localhost:4000/selectAdvancement',
       headers: {
           'crossDomain': true,  //For cors errors 
           'Content-Type': 'application/json'
@@ -39,30 +39,30 @@ class Acceuil extends Component {
       if(res.data[0]===undefined){
         axios({
           method: 'post',
-          url: 'http://localhost:4000/selectChapitre',
+          url: 'http://localhost:4000/selectChapter',
           data: {
-            Cours: subjectid,
-            Commence : true
+            subject_id: subjectid,
+            start : true
           }
         })
         .then(res => {
           let result = res.data[0];
           if(result.body != null){
             history.push({
-              pathname: '/chapitre',
+              pathname: '/chapter',
               state: { detail: result, userid:this.state.user_id, coursid:subjectid }
             })
           }
         }).catch(function(error){
-            console.log('error selectChapitre Avancement clickHandler '+error);
+            console.log('error selectChapter Advancement clickHandler '+error);
         });
       }else{
         axios({
           method: 'post',
-          url: 'http://localhost:4000/selectChapitre',
+          url: 'http://localhost:4000/selectChapter',
           data: {
-            Chapitre: res.data[0].cours.idChapitre,
-            Commence: false
+            chapter_id: res.data[0].cours.idChapitre,
+            start: false
           }
         }).then(res => {
           
@@ -71,33 +71,33 @@ class Acceuil extends Component {
             Popup.plugins().Affiche(court,resultat,this.state.user_id,subjectid); 
           }
         }).catch(function(error){
-          console.log('error selectChapitre Avancement clickHandler '+error);
+          console.log('error selectChapter Advancement clickHandler '+error);
         });
       }
     })
     .catch(function(error) {
-      console.log('error selectAvancement clickHandler '+error);
+      console.log('error selectAdvancement clickHandler '+error);
     });
   }else{   //utilisateur anonyme
     axios({
       method: 'post',
-      url: 'http://localhost:4000/selectChapitre',
+      url: 'http://localhost:4000/selectChapter',
       data: {
-        Cours: subjectid,
-        Commence : true
+        subject_id: subjectid,
+        start : true
       }
     })
     .then(res => {
       let result = res.data[0];
       if(result.body != null){
         history.push({
-          pathname: '/chapitre',
+          pathname: '/chapter',
           state: { detail: result,  userid:this.state.user_id, coursid:subjectid }
         })
       }
     })
     .catch(function(error) {
-      console.log('error selectChapitre nonconnecte clickHandler '+error);
+      console.log('error selectChapter nonconnecte clickHandler '+error);
     });
   }
   }
@@ -128,7 +128,7 @@ class Acceuil extends Component {
       this.setState({subjects : data});
     })
     .catch(function(error) {
-      console.log('error Acceuil componentWillMount '+error);
+      console.log('error Home componentWillMount '+error);
     });
   }
    
@@ -168,17 +168,17 @@ Popup.registerPlugin('Affiche', function (Cours,result,user_id,cours_id) {
           action: function () {
             axios({
               method: 'post',
-              url: 'http://localhost:4000/selectChapitre',
+              url: 'http://localhost:4000/selectChapter',
               data: {
-                Cours: cours_id,
-                Commence : true
+                subject_id: cours_id,
+                start : true
               }
             })
             .then(res => {
               let result = res.data[0];
               if(result.body != null){
                 history.push({
-                  pathname: '/chapitre',
+                  pathname: '/chapter',
                   state: { detail:result, userid:user_id, coursid:cours_id }
                 })
               }
@@ -193,7 +193,7 @@ Popup.registerPlugin('Affiche', function (Cours,result,user_id,cours_id) {
           className: 'success',
           action: function () {
               history.push({
-                pathname: '/chapitre',
+                pathname: '/chapter',
                 state: { detail:result, userid:user_id , coursid:cours_id }
               })
               Popup.close();
@@ -203,4 +203,4 @@ Popup.registerPlugin('Affiche', function (Cours,result,user_id,cours_id) {
   });
 });
 
-export default Acceuil;
+export default Home;
