@@ -16,7 +16,7 @@ Dans la version actuelle, les identifiants et bases sont déjà initialisées po
 
 Si une des bases de données est vide, vous pourrez trouver des scripts de peuplement dans le dossier 'Peuplement'.
 
-#Utilisation
+# Utilisation
 Pour lancer le serveur node, placez-vous dans la racine de 'Fil_Rouge' et lancez la commande '(sudo) node dist/index.js'.
 Le serveur aura par défaut le port 4000.
 Pour lancer l'application cliente, placez-vous dans le dossier 'Fil_Rouge/client' et lancez la commande 'sudo npm start'.
