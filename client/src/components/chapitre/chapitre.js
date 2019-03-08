@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './chapitre.css';
 import {Button} from 'react-bootstrap';
 import axios from 'axios';
+import history from '../history';
 
 class chapitre extends Component {
     constructor(props, context) {
@@ -19,12 +20,12 @@ class chapitre extends Component {
             next : null,
             menu : null
         }
-        this.clickHandler = this.clickHandler.bind(this);
+        this.clickHandlerPrevious = this._clickHandlerPrevious.bind(this);
+        this.clickHandlerNext = this._clickHandlerNext.bind(this);
     }
 
     componentWillMount() {
         let self=this;
-        console.log(self.state.idCours);
         axios({
             method: 'post',
             url: 'http://localhost:4000/getmenu',
@@ -52,25 +53,78 @@ class chapitre extends Component {
             console.log('error chapite componentWillMount '+error);
         });
     }
-    clickHandler(){
+    _clickHandlerPrevious(){
         let self=this;
-        console.log(self.state.Username);
         axios({
             method: 'post',
-            url: 'http://localhost:4000/avancement',
+            url: 'http://localhost:4000/getPreviousChapitre',
             data: {
-                user_id: self.state.Username,
-                idcours: self.state.idCours,
-                idChapitre: self.state.idChapitre
+                chapitre_id: self.state.idChapitre
             }
         })
-        .then(function(result) {
-           console.log(result);
+        .then(res => {
+            let result = res.data[0];
+            if(result.body != null){
+                this.setState({body:result.body})
+                this.setState({titre:result.titre})
+                this.setState({auteur:result.auteur})
+                this.setState({idChapitre:result.id})
+                this.componentWillMount()
+            }
         })
         .catch(function(error) {
-            console.log('error chapite componentWillMount '+error);
+            history.push({
+             pathname: '/acceuil'
+            })
+            console.log('error selectChapitre nonconnecte clickHandler '+error);
         });
     }
+
+    _clickHandlerNext(){
+       
+            axios({
+                method: 'post',
+                url: 'http://localhost:4000/getNextChapitre',
+                data: {
+                    chapitre_id: this.state.idChapitre
+                }
+            })
+            .then(res => {
+                let result = res.data[0];
+                if(result.body != null){
+                    this.setState({body:result.body})
+                    this.setState({titre:result.titre})
+                    this.setState({auteur:result.auteur})
+                    this.setState({idChapitre:result.id})
+                    axios({
+                        method: 'post',
+                        url: 'http://localhost:4000/avancement',
+                        data: {
+                            user_id: this.state.Username,
+                            idcours: this.state.idCours,
+                            idChapitre: this.state.idChapitre
+                        }
+                    })
+                    .then(function(result) { 
+                    })
+                    .catch(function(error) {
+                        console.log('error chapite componentWillMount '+error);
+                    });
+                    this.componentWillMount()
+                }
+                   
+            
+            })
+            .catch(function(error) {
+                 history.push({
+                  pathname: '/acceuil'
+                 })
+                console.log('error selectChapitre nonconnecte clickHandler '+error);
+            });
+       
+    }
+
+
   render(){
       return(
         <div>
@@ -87,7 +141,8 @@ class chapitre extends Component {
             </div>
             <br/>
             <div className="contenantSuivant">
-                <Button className='buttonNext' variant='primary' size='sm' onClick={this.clickHandler} >Suivant</Button>
+            <Button className='buttonNext' variant='primary' size='sm' onClick={this.clickHandlerPrevious} >Precedant</Button>
+                <Button className='buttonNext' variant='primary' size='sm' onClick={this.clickHandlerNext} >Suivant</Button>
             </div>
         </div>
       )

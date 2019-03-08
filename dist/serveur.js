@@ -120,35 +120,6 @@ class Server {
                 res.send(err);
             });
         });
-        app.post('/avancement', function (req, res) {
-            res.setHeader('Content-Type', 'application/json');
-            console.log(req.body);
-            let selection = { id: req.body.user_id, "cours.idcours": req.body.idcours };
-            let changement = { $set: { "cours.$.idChapitre": req.body.idChapitre } };
-            console.log(selection);
-            console.log(changement);
-            mongodbinstance.modifier(selection, changement, "Utilisateur")
-                .then(function (result) {
-                console.log('ici');
-                console.log(result);
-                if (result == null) {
-                    console.log('ouiiii');
-                    let selection = { id: req.body.user_id };
-                    let changement = { $push: { cours: { idcours: req.body.idcours, idChapitre: req.body.idChapitre } } };
-                    mongodbinstance.modifier(selection, changement, 'Utilisateur')
-                        .then(function (result) {
-                        res.send(result);
-                    }).catch(function (err) {
-                        res.send(err);
-                    });
-                }
-                res.send(result);
-            })
-                .catch(function (err) {
-                console.log('noo');
-                res.send(err);
-            });
-        });
         app.post('/selectAvancement', function (req, res) {
             res.setHeader('Content-Type', 'application/json');
             mongodbinstance.selectionAvancement(req.body.user_id, req.body.subject_id)
@@ -204,6 +175,52 @@ class Server {
                         });
                     }
                     res.send(data);
+                });
+            })
+                .catch(function (err) {
+                res.send(err);
+            });
+        });
+        app.post('/getPreviousChapitre', function (req, res) {
+            res.setHeader('Content-Type', 'application/json');
+            neo4jinstance.selectionChapitrePrecedantNeo4j(req.body.chapitre_id)
+                .then(function (result) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    if (result.id != null) {
+                        yield mongodbinstance.selectionChapitre(parseInt(result.id))
+                            .then(function (resultat) {
+                            res.send(resultat);
+                        })
+                            .catch(function (err) {
+                            res.send(err);
+                        });
+                    }
+                    else {
+                        res.send(null);
+                    }
+                });
+            })
+                .catch(function (err) {
+                res.send(err);
+            });
+        });
+        app.post('/getNextChapitre', function (req, res) {
+            res.setHeader('Content-Type', 'application/json');
+            neo4jinstance.selectionChapitreSuivantNeo4j(req.body.chapitre_id)
+                .then(function (result) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    if (result.id != null) {
+                        yield mongodbinstance.selectionChapitre(parseInt(result.id))
+                            .then(function (resultat) {
+                            res.send(resultat);
+                        })
+                            .catch(function (err) {
+                            res.send(err);
+                        });
+                    }
+                    else {
+                        res.send(null);
+                    }
                 });
             })
                 .catch(function (err) {
