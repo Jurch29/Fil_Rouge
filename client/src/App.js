@@ -6,7 +6,7 @@ import Auth from './components/auth/auth';
 
 class App extends Component {
   render() {
-    return (
+    return(
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
